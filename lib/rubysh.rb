@@ -5,6 +5,7 @@ require_relative "rubysh/version"
 module Rubysh
   require_relative "rubysh/command"
   require_relative "rubysh/chainer"
+  require_relative "rubysh/chain_context"
   require_relative "rubysh/executor"
 end
 
@@ -17,11 +18,19 @@ module Kernel
     @sh_unsafe_mode = value
   end
 
+  def cd(path, &)
+    Dir.chdir(path, &)
+  end
+
   def method_missing(method_name, *args, &)
     if @sh_unsafe_mode
       Rubysh::Executor.send(method_name.to_s.gsub('!', ''), *args, &)
     else
       super
     end
+  end
+
+  def chain(&)
+    Rubysh::ChainContext.class_eval(&).exec_commands
   end
 end

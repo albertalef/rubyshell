@@ -1,54 +1,44 @@
 
 module Rubysh
   class Chainer
-    def initialize(*commands)
-      raise 'Cannot chain non commands' if commands.any? { |a| !a.is_a?(Rubysh::Command)}
-
-      @commands = commands
+    def initialize(command)
+      @parts = [command]
     end
 
-    def |(arg)
-      raise 'Cannot chain non commands' if !arg.is_a?(Rubysh::Command)
-
-      if arg.is_a?(Rubysh::Chainer)
-        @commands += arg.commands
-      else
-        @commands << arg
-      end
+    def handle_chain(operator, chainer)
+      @parts = [*@parts, operator.to_s, *chainer.parts]
 
       self
     end
 
-    def <<(arg)
-      raise 'Cannot chain non commands' if !arg.is_a?(Rubysh::Command)
-
-      if arg.is_a?(Rubysh::Chainer)
-        @commands = [*arg.commands, *@commands]
+    def method_missing(method_name, *args, &)
+      if method_name.start_with?(/[^A-Za-z0-9]/)
+        handle_chain(method_name, args.first)
       else
-        @commands.unshift(arg)
+        super
       end
+    end
 
-      self
+    def respond_to_missing?(name, _include_private)
+      false
     end
 
     def exec_commands
-      %x{#{to_shell}}
+      %x{#{to_shell}}.chomp
     end
 
-    def commands
-      @commands
-    end
-
-    def command_strings
-      @commands.map(&:to_shell)
+    def parts
+      @parts
     end
 
     def to_shell
-      command_strings.join(' | ')
-    end
-
-    def inspect
-      puts exec_commands
+      parts.map do |part|
+        if part.is_a?(Rubysh::Command)
+          part.to_shell
+        else
+          part
+        end
+      end.join(" ")
     end
   end
 end
