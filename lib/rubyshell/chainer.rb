@@ -1,5 +1,5 @@
 
-module Rubysh
+module RubyShell
   class Chainer
     def initialize(command)
       @parts = [command]
@@ -33,7 +33,7 @@ module Rubysh
 
     def to_shell
       parts.map do |part|
-        if part.is_a?(Rubysh::Command)
+        if part.is_a?(RubyShell::Command)
           part.to_shell
         else
           part

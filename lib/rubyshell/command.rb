@@ -1,4 +1,4 @@
-module Rubysh
+module RubyShell
   class Command
     def initialize(command_name, *args, &block)
       @command_name = command_name
