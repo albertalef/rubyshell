@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["albertalef@protonmail.com"]
 
   spec.summary = "A rubist way to run shell commands"
-  spec.description = "A long description, short for now"
+  spec.description = "A rubist way to run shell commands"
   spec.homepage = "https://github.com/albertalef/rubyshell"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
