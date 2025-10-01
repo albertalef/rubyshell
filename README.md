@@ -1,3 +1,9 @@
+<h1 align="center">
+  <img alt="Typst" style="width:60%;" src="./docs/images/rubyshelllogo.png">
+</h1>
+
+
+
 # Rubysh
 
 TODO: Delete this and the text below, and describe your gem
