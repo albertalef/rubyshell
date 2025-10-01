@@ -8,6 +8,9 @@
   <a href="https://rubygems.org/gems/rubyshell">
     <img src="https://img.shields.io/gem/v/rubyshell?color=red&logo=ruby" alt="Gem Version">
   </a>
+  <a href="https://rubygems.org/gems/rubyshell">
+    <img src="https://img.shields.io/gem/dt/rubyshell.svg?label=Downloads&colorA=004d99&colorB=0073e6" alt="Gem Version">
+  </a>
   <a href="https://github.com/albertalef/rubysh/actions">
     <img src="https://github.com/albertalef/rubysh/workflows/CI/badge.svg" alt="Build Status">
   </a>
