@@ -17,7 +17,19 @@
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
   </a>
+
+  <p align="center">
+    <a href="Examples">Examples</a>
+    ·
+    <a href="Instalation">Instalation</a>
+    ·
+    <a href="Documentation">Documentation</a>
+    ·
+    <a href="Contributing">Contributing</a>
+  </p>
 </p>
+<br />
+<br />
 
 ```ruby
 cd "/log" do
