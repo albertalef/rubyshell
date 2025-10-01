@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img alt="Typst" style="width:60%;" src="./docs/images/rubyshelllogo.png">
+  <img alt="Typst" style="width:60%;" src="./docs/images/rubyshelllogohalf.png">
 </h1>
 
 
