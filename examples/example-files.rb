@@ -2,7 +2,6 @@
 
 require 'rubyshell'
 require "securerandom"
-require "debug"
 
 sh do
   mkdir "files"
