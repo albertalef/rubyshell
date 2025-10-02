@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rubyshell (1.0.0)
+    rubyshell (1.0.1)
 
 GEM
   remote: https://rubygems.org/
