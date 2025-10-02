@@ -4,9 +4,9 @@ require "rubyshell"
 require "json"
 
 sh do
-  response = JSON.parse(curl("-s", "https://official-joke-api.appspot.com/random_ten"))
+  response = curl("-s", "https://official-joke-api.appspot.com/random_ten")
 
-  response.each.with_index do |data, i|
+  JSON.parse(response).each.with_index do |data, i|
     puts " Joke: #{i.next} ".center(30, "-")
     puts "Setup: #{data["setup"]}"
     puts "Punchline: #{data["punchline"]}"
