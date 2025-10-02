@@ -19,24 +19,26 @@
   </a>
 
   <p align="center">
-    <a href="Examples">Examples</a>
-    ·
     <a href="Instalation">Instalation</a>
     ·
-    <a href="Documentation">Documentation</a>
+    <a href="Usage">Usage</a>
+    ·
+    <a href="Complete example">Examples</a>
     ·
     <a href="Contributing">Contributing</a>
+    ·
+    <a href="Sponsors">Sponsors</a>
   </p>
 </p>
 <br />
 <br />
 
 ```ruby
-cd "/log" do
-  ls.each_line do |line|
-    puts cat(line)
+  cd "/log" do
+    ls.each_line do |line|
+      puts cat(line)
+    end
   end
-end
 ```
 
 Yes, that’s valid Ruby!
@@ -52,12 +54,119 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
     $ gem install rubyshell
 
-## Todo
+## Usage
 
-- [ ] Usage
-- [ ] More examples
-- [ ] Tests
-- [ ] Github Action
+### Calling a shell command
+With RubyShell, every shell command can be used inside the ruby, you just need to call
+
+```ruby
+sh do
+  puts pwd # => /Users/albertalef/projects/rubyshell
+end
+```
+
+### Passing arguments
+Here we have different ways to pass arguments to a command.
+You can separate strings, use only one, use hashes, anyway will work
+
+```ruby
+sh do
+  docker("ps", all: true) # Using hash syntax = docker ps --all
+
+  docker("ps", a: true) # Using hash syntax = docker ps -a
+
+  docker("ps", '-a') # Passing multiple strings = docker ps -a
+
+  docker("ps -a") # Passing one string = docker ps -a
+end
+```
+
+### Changing folder
+Has two possible ways, changing the folder of the code, or running code only inside a folder 
+
+##### Chaging code folder
+```ruby
+sh do
+  puts pwd # => /Users/albertalef/projects/rubyshell
+
+  cd 'examples'
+
+  puts pwd  # => /Users/albertalef/projects/rubyshell/examples
+end
+```
+
+##### Executing code inside another folder
+
+```ruby
+sh do
+  cd 'examples' do
+    puts pwd  # => /Users/albertalef/projects/rubyshell/examples
+  end
+
+  puts pwd  # => /Users/albertalef/projects/rubyshell
+end
+```
+
+### Chaining commands
+The `chain` method make possible we use shell operators inside the ruby, like `& && | > >> < <<`
+
+```ruby
+sh do
+  chain { echo "Dummy text" >> "dummy.txt" }
+  
+  puts cat("dummy.txt") # => "Dummy text"
+end
+
+sh do
+  number_of_files = chain { ls | wc('-l') }.chomp
+
+  puts number_of_files # => 5
+end
+```
+
+## Complete example
+
+```ruby
+#!/usr/bin/env ruby
+
+require "rubyshell"
+require "securerandom"
+
+sh do
+  mkdir "files"
+
+  cd "files" do
+    5.times do |i|
+      chain do
+        echo(SecureRandom.alphanumeric(16)) >> "#{i}.txt"
+      end
+    end
+
+    puts "Number of Files: #{ls.lines.count}"
+
+    ls.each_line do |filename|
+      puts cat(filename)
+    end
+  end
+ensure
+  rm "-rf files"
+end
+
+# Running:
+#
+# ❯ ./examples/example1.rb
+#
+# Number of Files: 5
+# o6Kw8KHvWJnLGSeQ
+# qkRKcZHqu2Moq1se
+# nUPluln9GM1ydtoz
+# rkdYsc1RBhkeN1dq
+# ZPXZMqzYfyFfjPHF
+```
+
+## Coming
+
+- Support to Streams
 
 ## Development
 
