@@ -52,7 +52,12 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
     $ gem install rubyshell
 
-## Usage
+## Todo
+
+- [ ] Usage
+- [ ] More examples
+- [ ] Tests
+- [ ] Github Action
 
 ## Development
 
