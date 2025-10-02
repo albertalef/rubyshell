@@ -19,15 +19,15 @@
   </a>
 
   <p align="center">
-    <a href="Instalation">Instalation</a>
+    <a href="#installation">Installation</a>
     ·
-    <a href="Usage">Usage</a>
+    <a href="#usage">Usage</a>
     ·
-    <a href="Complete example">Examples</a>
+    <a href="#complete-example">Examples</a>
     ·
-    <a href="Contributing">Contributing</a>
+    <a href="#contributing">Contributing</a>
     ·
-    <a href="Sponsors">Sponsors</a>
+    <a href="#sponsors">Sponsors</a>
   </p>
 </p>
 <br />
