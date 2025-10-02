@@ -11,8 +11,8 @@
   <a href="https://rubygems.org/gems/rubyshell">
     <img src="https://img.shields.io/gem/dt/rubyshell.svg?label=Downloads&colorA=004d99&colorB=0073e6" alt="Gem Version">
   </a>
-  <a href="https://github.com/albertalef/rubysh/actions">
-    <img src="https://github.com/albertalef/rubysh/workflows/CI/badge.svg" alt="Build Status">
+  <a href="https://github.com/albertalef/rubyshell/actions/workflows/main.yml">
+    <img src="https://github.com/albertalef/rubyshell/actions/workflows/main.yml/badge.svg" alt="Build Status">
   </a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
