@@ -2,8 +2,8 @@
 
 module RubyShell
   class Executor
-    def self.method_missing(method_name, ...)
-      RubyShell::Command.new(method_name, ...).exec_command
+    def self.method_missing(method_name, *args)
+      RubyShell::Command.new(method_name, *args).exec_command
     end
 
     def self.respond_to_missing?(_name, _include_private)

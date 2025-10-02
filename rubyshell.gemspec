@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = "A rubist way to run shell commands"
   spec.homepage = "https://github.com/albertalef/rubyshell"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.0.0"
+  spec.required_ruby_version = ">= 2.6.0"
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
 
