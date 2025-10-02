@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RubyShell
   class Command
     def initialize(command_name, *args, &block)
@@ -13,7 +15,7 @@ module RubyShell
     def exec_command
       result = `#{to_shell}`.chomp
 
-      raise "Command Failed" unless $?.success?
+      raise "Command Failed" unless $CHILD_STATUS.success?
 
       result
     end
@@ -22,21 +24,27 @@ module RubyShell
       @args.map do |arg|
         case arg
         when Hash
-          arg.map do |k, v|
-            next if k.start_with?("_")
-
-            key = if k.length == 1
-                    "-#{k}"
-                  else
-                    "--#{k}"
-                  end
-
-            [key, v.is_a?(TrueClass) ? nil : v].compact.join(" ")
-          end.compact
+          map_hash_arg(arg)
         else
           arg.to_s
         end
       end.flatten
+    end
+
+    private
+
+    def map_hash_arg(arg)
+      arg.map do |k, v|
+        next if k.start_with?("_")
+
+        key = if k.length == 1
+                "-#{k}"
+              else
+                "--#{k}"
+              end
+
+        [key, v.is_a?(TrueClass) ? nil : v].compact.join(" ")
+      end.compact
     end
   end
 end

@@ -8,30 +8,18 @@ require_relative "rubyshell/executor"
 
 module Kernel
   def sh(&block)
-    if !block.nil?
-      RubyShell::Executor.class_eval(&block)
-    else
+    if block.nil?
       RubyShell::Executor
-    end
-  end
-
-  def sh_unsafe_mode(value)
-    @sh_unsafe_mode = value
-  end
-
-  def cd(path, &)
-    Dir.chdir(path, &)
-  end
-
-  def method_missing(method_name, *args, &)
-    if @sh_unsafe_mode
-      RubyShell::Executor.send(method_name.to_s.gsub('!', ''), *args, &)
     else
-      super
+      RubyShell::Executor.class_eval(&block)
     end
   end
 
-  def chain(&)
-    RubyShell::ChainContext.class_eval(&).exec_commands
+  def cd(path, &block)
+    Dir.chdir(path, &block)
+  end
+
+  def chain(&block)
+    RubyShell::ChainContext.class_eval(&block).exec_commands
   end
 end
