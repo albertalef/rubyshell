@@ -15,7 +15,6 @@ jobs:
       matrix:
         ruby:
           - '2.6.0'
-          - '3.0.0'
           - '3.2.2'
 
     steps:
