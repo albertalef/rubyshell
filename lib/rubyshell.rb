@@ -14,12 +14,4 @@ module Kernel
       RubyShell::Executor.class_eval(&block)
     end
   end
-
-  def cd(path, &block)
-    Dir.chdir(path, &block)
-  end
-
-  def chain(&block)
-    RubyShell::ChainContext.class_eval(&block).exec_commands
-  end
 end

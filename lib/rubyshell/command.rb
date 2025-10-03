@@ -15,7 +15,7 @@ module RubyShell
     def exec_command
       result = `#{to_shell}`.chomp
 
-      raise "Command Failed" unless $CHILD_STATUS.success?
+      raise "Command Failed" unless $?.success?
 
       result
     end

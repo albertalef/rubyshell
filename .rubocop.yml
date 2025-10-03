@@ -16,3 +16,6 @@ Style/Documentation:
 
 Layout/LineLength:
   Max: 120
+
+Style/SpecialGlobalVars:
+  Enabled: false

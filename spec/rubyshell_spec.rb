@@ -1,0 +1,135 @@
+# frozen_string_literal: true
+
+require "tmpdir"
+require "debug"
+
+RSpec.describe RubyShell do
+  around(:example) do |example|
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) { example.run }
+    end
+  end
+
+  describe "Validating Returns" do
+    context "when trying to create a new folder and print the path" do
+      before do
+        sh do
+          mkdir "example-folder"
+
+          cd "example-folder"
+        end
+      end
+
+      def subject_call
+        sh { pwd }
+      end
+
+      it "retuns the correct filepath" do
+        expect(subject_call).to include("/example-folder")
+      end
+
+      it "creates a new folder named example-folder" do
+        subject_call
+
+        expect(Dir["../*"]).to eq(["../example-folder"])
+      end
+    end
+
+    context "when trying to execute a command that does not exists" do
+      def subject_call
+        sh { nonexistingcommand }
+      end
+
+      # TODO: Make return a Command Execution Error
+      it "retuns a Command Execution Error" do
+        expect { subject_call }.to raise_error(Errno::ENOENT, /No such file or directory/)
+      end
+    end
+
+    context "when execute a command and get a not 0 exit code" do
+      def subject_call
+        sh { ls("notexistingfolder") }
+      end
+
+      # TODO: Make return a Command Execution Error
+      it "retuns a Command Execution Error" do
+        expect { subject_call }.to raise_error(RuntimeError, "Command Failed")
+      end
+    end
+
+    context "when execute directly the command" do
+      def subject_call
+        sh.mkdir "example-folder"
+        sh.cd "example-folder"
+        sh.pwd
+      end
+
+      it "retuns the correct filepath" do
+        expect(subject_call).to include("/example-folder")
+      end
+
+      it "creates a new folder named example-folder" do
+        subject_call
+
+        expect(Dir["../*"]).to eq(["../example-folder"])
+      end
+    end
+  end
+
+  describe "Validating Chains" do
+    context "when counting files in current folder" do
+      def subject_call
+        sh do
+          chain { ls | wc("-l") }
+        end
+      end
+
+      it "returns an string" do
+        expect(subject_call.strip).to eq("0")
+      end
+    end
+
+    context "when counting files in current folder" do
+      def subject_call
+        sh do
+          chain { ls | wc("-l") }
+        end
+      end
+
+      it "returns an string" do
+        expect(subject_call.strip).to eq("0")
+      end
+    end
+
+    context "when using string as operator pair" do
+      def subject_call
+        sh do
+          chain { echo("Pretty Content") >> "testfile.txt" }
+
+          cat "testfile.txt"
+        end
+      end
+
+      it "returns an string" do
+        expect(subject_call).to eq("Pretty Content")
+      end
+    end
+
+    context "when execute a command and get a not 0 exit code" do
+      def subject_call
+        sh do
+          chain { ls("notexistingfolder") }
+        end
+      end
+
+      # TODO: Make return a Command Execution Error
+      it "retuns a Command Execution Error" do
+        expect { subject_call }.to raise_error(RuntimeError, "Command Failed")
+      end
+    end
+  end
+
+  it "has a version number" do
+    expect(RubyShell::VERSION).not_to be nil
+  end
+end
