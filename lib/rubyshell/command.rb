@@ -43,7 +43,7 @@ module RubyShell
                 "--#{k}"
               end
 
-        [key, v.is_a?(TrueClass) ? nil : v].compact.join(" ")
+        [key, v.is_a?(TrueClass) ? nil : "'#{v}'"].compact.join(" ")
       end.compact
     end
   end

@@ -129,6 +129,16 @@ RSpec.describe RubyShell do
     end
   end
 
+  describe "Validating Command Class" do
+    context "when hash arg value has is not a TrueClass" do
+      let(:subject_instance) { RubyShell::Command.new("example", firstparam: "Short Phrase") }
+
+      it "returns the correct shell command" do
+        expect(subject_instance.to_shell).to eq("example --firstparam 'Short Phrase'")
+      end
+    end
+  end
+
   it "has a version number" do
     expect(RubyShell::VERSION).not_to be nil
   end
