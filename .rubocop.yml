@@ -1,6 +1,7 @@
 AllCops:
   NewCops: enable
   TargetRubyVersion: 2.6
+  SuggestExtensions: false
 
 
 Style/StringLiterals:
@@ -19,3 +20,10 @@ Layout/LineLength:
 
 Style/SpecialGlobalVars:
   Enabled: false
+
+Metrics/BlockLength:
+  Max: 200
+
+Lint/ConstantDefinitionInBlock:
+  Exclude:
+    - "spec/spec_helper.rb"
