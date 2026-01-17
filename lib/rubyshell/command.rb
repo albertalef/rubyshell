@@ -12,14 +12,6 @@ module RubyShell
       [@command_name.to_s.gsub("!", ""), *parsed_args].join(" ")
     end
 
-    def exec_command
-      result = `#{to_shell}`.chomp
-
-      raise "Command Failed" unless $?.success?
-
-      result
-    end
-
     def parsed_args
       @args.map do |arg|
         case arg
@@ -45,6 +37,20 @@ module RubyShell
 
         [key, v.is_a?(TrueClass) ? nil : "'#{v}'"].compact.join(" ")
       end.compact
+    end
+
+    class Error < StandardError
+      attr_reader :stdout, :stderr, :status, :command
+
+      def initialize(command:, stdout:, stderr:, status:)
+        @command = command
+        @stdout = stdout
+        @stderr = stderr
+        @status = status
+        super("Command failed: #{command}\n#{stderr.chomp}")
+      end
+
+      def exit_code = status.exitstatus
     end
   end
 end

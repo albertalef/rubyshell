@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "open3"
+
 module RubyShell
   class Chainer
     attr_reader :parts
@@ -21,6 +23,10 @@ module RubyShell
     def method_missing(method_name, *args, &block)
       if method_name.start_with?(/[^A-Za-z0-9]/)
         handle_chain(method_name, args.first)
+
+      elsif String.new.respond_to?(method_name)
+        exec_commands.send(method_name, *args, &block)
+
       else
         super
       end
@@ -31,7 +37,13 @@ module RubyShell
     end
 
     def exec_commands
-      `#{to_shell}`.chomp
+      Open3.capture3(to_shell).then do |stdout, stderr, status|
+        if status.success?
+          stdout.chomp
+        else
+          raise RubyShell::Command::Error.new(command: to_shell, stdout:, stderr:, status:)
+        end
+      end
     end
 
     def to_shell
@@ -43,5 +55,9 @@ module RubyShell
         end
       end.join(" ")
     end
+
+    def to_s = exec_commands
+    def to_str = to_s
+    def inspect = to_s
   end
 end
