@@ -65,6 +65,15 @@ sh do
 end
 ```
 
+### Using without the block
+If you want to start an irb or pry session, and run commands as first-class citizens then do the following.
+
+```ruby
+extend RubyShell::Executor
+
+pwd # => /Users/albertalef/projects/rubyshell
+```
+
 ### Passing arguments
 Here we have different ways to pass arguments to a command.
 You can separate strings, use only one, use hashes, anyway will work
