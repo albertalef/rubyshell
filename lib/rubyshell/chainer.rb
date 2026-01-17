@@ -38,11 +38,11 @@ module RubyShell
 
     def exec_commands
       Open3.capture3(to_shell).then do |stdout, stderr, status|
-        if status.success?
-          stdout.chomp
-        else
-          raise RubyShell::Command::Error.new(command: to_shell, stdout:, stderr:, status:)
+        unless status.success?
+          raise RubyShell::Command::Error.new(command: to_shell, stdout: stdout, stderr: stderr, status: status)
         end
+
+        stdout.chomp
       end
     end
 
@@ -56,8 +56,16 @@ module RubyShell
       end.join(" ")
     end
 
-    def to_s = exec_commands
-    def to_str = to_s
-    def inspect = to_s
+    def to_s
+      exec_commands
+    end
+
+    def to_str
+      to_s
+    end
+
+    def inspect
+      to_s
+    end
   end
 end

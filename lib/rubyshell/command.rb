@@ -47,10 +47,13 @@ module RubyShell
         @stdout = stdout
         @stderr = stderr
         @status = status
+
         super("Command failed: #{command}\n#{stderr.chomp}")
       end
 
-      def exit_code = status.exitstatus
+      def exit_code
+        status.exitstatus
+      end
     end
   end
 end
