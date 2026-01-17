@@ -24,7 +24,7 @@ module RubyShell
       if method_name.start_with?(/[^A-Za-z0-9]/)
         handle_chain(method_name, args.first)
 
-      elsif String.new.respond_to?(method_name)
+      elsif String.instance_methods.include?(method_name)
         exec_commands.send(method_name, *args, &block)
 
       else
