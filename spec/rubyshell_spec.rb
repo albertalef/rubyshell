@@ -139,7 +139,7 @@ RSpec.describe RubyShell do
   describe "Validating Executor Module" do
     context "when extending module" do
       def subject_call
-        extend RubyShell::Executor
+        extend RubyShell::Executor # rubocop:disable Layout/EmptyLinesAfterModuleInclusion
 
         mkdir "example-folder"
         cd "example-folder"
