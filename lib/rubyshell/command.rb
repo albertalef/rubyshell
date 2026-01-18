@@ -3,8 +3,6 @@
 require "open3"
 
 module RubyShell
-  INTERACTIVE_SESSION = /\b(irb|pry)\b/.freeze
-
   class Command
     def initialize(command_name, *args, &block)
       @command_name = command_name
@@ -24,8 +22,10 @@ module RubyShell
 
         StringWrapper.new(stdout.chomp)
       end
-    rescue StandardError
-      raise RubyShell::CommandError.new(command: to_shell)
+    rescue StandardError => e
+      raise e if e.is_a?(RubyShell::CommandError)
+
+      raise RubyShell::CommandError.new(command: to_shell, message: e.message)
     end
 
     def parsed_args
@@ -56,20 +56,9 @@ module RubyShell
     end
   end
 
-  class CommandError < StandardError
-    def initialize(command:, stdout: "", stderr: "", status: "")
-      @command = command
-      @stdout = stdout
-      @stderr = stderr
-      @status = status
-
-      super
-    end
-  end
-
   class StringWrapper < String
     def inspect
-      if $0.match?(INTERACTIVE_SESSION)
+      if $stdin.isatty
         to_s
       else
         super
