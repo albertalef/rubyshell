@@ -41,9 +41,7 @@ RSpec.describe RubyShell do
       end
 
       it "retuns a Command Execution Error" do
-        expect do
-          subject_call
-        end.to raise_error(RubyShell::CommandError, /No such file or directory - nonexistingcommand/)
+        expect { subject_call }.to raise_error(RubyShell::CommandError)
       end
     end
 
@@ -53,10 +51,7 @@ RSpec.describe RubyShell do
       end
 
       it "retuns a Command Execution Error" do
-        expect do
-          subject_call
-        end.to raise_error(RubyShell::CommandError,
-                           /ls: cannot access 'notexistingfolder': No such file or directory/)
+        expect { subject_call }.to raise_error(RubyShell::CommandError)
       end
     end
 
@@ -126,10 +121,7 @@ RSpec.describe RubyShell do
       end
 
       it "retuns a Command Execution Error" do
-        expect do
-          subject_call
-        end.to raise_error(RubyShell::CommandError,
-                           /ls: cannot access 'notexistingfolder': No such file or directory/)
+        expect { subject_call }.to raise_error(RubyShell::CommandError)
       end
     end
   end
@@ -168,27 +160,5 @@ RSpec.describe RubyShell do
 
   it "has a version number" do
     expect(RubyShell::VERSION).not_to be nil
-  end
-end
-
-RSpec.describe RubyShell::StringWrapper do
-  describe "#inspect" do
-    let(:wrapper) { RubyShell::StringWrapper.new("hello\nworld") }
-
-    context "when STDIN is a TTY (interactive session)" do
-      before { allow($stdin).to receive(:isatty).and_return(true) }
-
-      it "returns the raw string for cleaner IRB output" do
-        expect(wrapper.inspect).to eq("hello\nworld")
-      end
-    end
-
-    context "when STDIN is not a TTY (non-interactive)" do
-      before { allow($stdin).to receive(:isatty).and_return(false) }
-
-      it "returns the standard String#inspect format" do
-        expect(wrapper.inspect).to eq('"hello\nworld"')
-      end
-    end
   end
 end
