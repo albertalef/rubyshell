@@ -120,7 +120,6 @@ RSpec.describe RubyShell do
         end
       end
 
-      # TODO: Make return a Command Execution Error
       it "retuns a Command Execution Error" do
         expect { subject_call }.to raise_error(RubyShell::CommandError)
       end
@@ -133,6 +132,20 @@ RSpec.describe RubyShell do
 
       it "returns the correct shell command" do
         expect(subject_instance.to_shell).to eq("example --firstparam 'Short Phrase'")
+      end
+    end
+  end
+
+  describe "Validating Executor Class" do
+    it "the current context can extend Executor and call methods" do
+      experiment = lambda do
+        extend RubyShell::Executor
+
+        pwd
+      end
+
+      experiment.call.then do |result|
+        expect(result).to include("/")
       end
     end
   end
