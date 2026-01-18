@@ -2,9 +2,6 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 2.6
   SuggestExtensions: false
-  Exclude:
-    - ".irbrc"
-
 
 Style/StringLiterals:
   Enabled: true
