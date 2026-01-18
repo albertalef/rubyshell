@@ -4,7 +4,9 @@ module RubyShell
   module Executor
     module_function
 
-    include RubyShell::OverwritedCommands
+    def cd(path, &block)
+      Dir.chdir(path, &block)
+    end
 
     def chain(&block)
       RubyShell::ChainContext.class_eval(&block).exec_commands

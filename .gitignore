@@ -10,6 +10,4 @@
 # rspec failure tracking
 .rspec_status
 
-.irbrc
-
 rubyshell-*.gem
