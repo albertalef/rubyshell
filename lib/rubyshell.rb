@@ -4,6 +4,7 @@ require_relative "rubyshell/version"
 require_relative "rubyshell/command"
 require_relative "rubyshell/chainer"
 require_relative "rubyshell/chain_context"
+require_relative "rubyshell/overwrited_commands"
 require_relative "rubyshell/executor"
 require_relative "rubyshell/error"
 
