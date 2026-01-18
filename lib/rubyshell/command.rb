@@ -60,6 +60,8 @@ module RubyShell
       @stdout = stdout
       @stderr = stderr
       @status = status
+
+      super
     end
   end
 end
