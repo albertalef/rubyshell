@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "open3"
+
 module RubyShell
   class Command
     def initialize(command_name, *args, &block)
@@ -13,11 +15,15 @@ module RubyShell
     end
 
     def exec_command
-      result = `#{to_shell}`.chomp
+      Open3.capture3(to_shell).then do |stdout, stderr, status|
+        unless status.success?
+          raise RubyShell::CommandError.new(command: to_shell, stdout: stdout, stderr: stderr, status: status)
+        end
 
-      raise "Command Failed" unless $?.success?
-
-      result
+        stdout.chomp
+      end
+    rescue StandardError
+      raise RubyShell::CommandError.new(command: to_shell)
     end
 
     def parsed_args
@@ -45,6 +51,17 @@ module RubyShell
 
         [key, v.is_a?(TrueClass) ? nil : "'#{v}'"].compact.join(" ")
       end.compact
+    end
+  end
+
+  class CommandError < StandardError
+    def initialize(command:, stdout: "", stderr: "", status: "")
+      @command = command
+      @stdout = stdout
+      @stderr = stderr
+      @status = status
+
+      super
     end
   end
 end

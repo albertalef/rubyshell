@@ -40,9 +40,8 @@ RSpec.describe RubyShell do
         sh { nonexistingcommand }
       end
 
-      # TODO: Make return a Command Execution Error
       it "retuns a Command Execution Error" do
-        expect { subject_call }.to raise_error(Errno::ENOENT, /No such file or directory/)
+        expect { subject_call }.to raise_error(RubyShell::CommandError)
       end
     end
 
@@ -51,9 +50,8 @@ RSpec.describe RubyShell do
         sh { ls("notexistingfolder") }
       end
 
-      # TODO: Make return a Command Execution Error
       it "retuns a Command Execution Error" do
-        expect { subject_call }.to raise_error(RuntimeError, "Command Failed")
+        expect { subject_call }.to raise_error(RubyShell::CommandError)
       end
     end
 
@@ -122,9 +120,8 @@ RSpec.describe RubyShell do
         end
       end
 
-      # TODO: Make return a Command Execution Error
       it "retuns a Command Execution Error" do
-        expect { subject_call }.to raise_error(RuntimeError, "Command Failed")
+        expect { subject_call }.to raise_error(RubyShell::CommandError)
       end
     end
   end
@@ -135,6 +132,28 @@ RSpec.describe RubyShell do
 
       it "returns the correct shell command" do
         expect(subject_instance.to_shell).to eq("example --firstparam 'Short Phrase'")
+      end
+    end
+  end
+
+  describe "Validating Executor Module" do
+    context "when extending module" do
+      def subject_call
+        extend RubyShell::Executor
+
+        mkdir "example-folder"
+        cd "example-folder"
+        pwd
+      end
+
+      it "retuns the correct filepath" do
+        expect(subject_call).to include("/example-folder")
+      end
+
+      it "creates a new folder named example-folder" do
+        subject_call
+
+        expect(Dir["../*"]).to eq(["../example-folder"])
       end
     end
   end
