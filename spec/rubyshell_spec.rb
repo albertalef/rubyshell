@@ -136,7 +136,7 @@ RSpec.describe RubyShell do
     end
   end
 
-  describe "Validating Executor Class" do
+  describe "Validating Executor Module" do
     it "the current context can extend Executor and call methods" do
       experiment = lambda do
         extend RubyShell::Executor
