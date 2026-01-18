@@ -137,17 +137,26 @@ RSpec.describe RubyShell do
   end
 
   describe "Validating Executor Module" do
-    it "the current context can extend Executor and call methods" do
-      experiment = lambda do
+    context "when extending module" do
+      def subject_call
         extend RubyShell::Executor
 
+        mkdir "example-folder"
+        cd "example-folder"
         pwd
       end
 
-      experiment.call.then do |result|
-        expect(result).to include("/")
+      it "retuns the correct filepath" do
+        expect(subject_call).to include("/example-folder")
+      end
+
+      it "creates a new folder named example-folder" do
+        subject_call
+
+        expect(Dir["../*"]).to eq(["../example-folder"])
       end
     end
+  end
   end
 
   it "has a version number" do
