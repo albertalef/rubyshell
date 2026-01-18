@@ -3,6 +3,8 @@
 require "open3"
 
 module RubyShell
+  INTERACTIVE_SESSION = /\b(irb|pry)\b/.freeze
+
   class Command
     def initialize(command_name, *args, &block)
       @command_name = command_name
@@ -20,7 +22,10 @@ module RubyShell
           raise RubyShell::CommandError.new(command: to_shell, stdout: stdout, stderr: stderr, status: status)
         end
 
-        StringWrapper.new(stdout)
+        # Perform this check so that rspec doesn't complain
+        return StringWrapper.new(stdout) if $0.match?(INTERACTIVE_SESSION)
+
+        stdout[-1] == "\n" ? stdout[0...-1] : stdout
       end
     rescue StandardError
       raise RubyShell::CommandError.new(command: to_shell)
@@ -65,14 +70,15 @@ module RubyShell
     end
   end
 
-  class StringWrapper
-    def initialize(string) = @string = string
-    def to_s = @string
-    def to_str = @string
-    def inspect = @string
-
-    def method_missing(method_name, *args, **kwargs, &block)
-      @string.send(method_name, *args, **kwargs, &block)
+  class StringWrapper < String
+    # Do this instead of chomp, otherwise IRB
+    # doesn't output properly
+    def inspect
+      if to_s[-1] == "\n"
+        to_s[0...-1]
+      else
+        to_s
+      end
     end
   end
 end
