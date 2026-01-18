@@ -40,6 +40,10 @@ module RubyShell
 
         stdout.chomp
       end
+    rescue StandardError => e
+      raise e if e.is_a?(RubyShell::CommandError)
+
+      raise RubyShell::CommandError.new(command: to_shell, message: e.message)
     end
 
     def to_shell

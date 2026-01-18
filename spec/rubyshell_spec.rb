@@ -41,7 +41,9 @@ RSpec.describe RubyShell do
       end
 
       it "retuns a Command Execution Error" do
-        expect { subject_call }.to raise_error(RubyShell::CommandError)
+        expect do
+          subject_call
+        end.to raise_error(RubyShell::CommandError, /No such file or directory - nonexistingcommand/)
       end
     end
 
@@ -51,7 +53,10 @@ RSpec.describe RubyShell do
       end
 
       it "retuns a Command Execution Error" do
-        expect { subject_call }.to raise_error(RubyShell::CommandError)
+        expect do
+          subject_call
+        end.to raise_error(RubyShell::CommandError,
+                           /ls: cannot access 'notexistingfolder': No such file or directory/)
       end
     end
 
@@ -121,7 +126,10 @@ RSpec.describe RubyShell do
       end
 
       it "retuns a Command Execution Error" do
-        expect { subject_call }.to raise_error(RubyShell::CommandError)
+        expect do
+          subject_call
+        end.to raise_error(RubyShell::CommandError,
+                           /ls: cannot access 'notexistingfolder': No such file or directory/)
       end
     end
   end

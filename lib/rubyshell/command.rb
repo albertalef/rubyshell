@@ -22,8 +22,10 @@ module RubyShell
 
         stdout.chomp
       end
-    rescue StandardError
-      raise RubyShell::CommandError.new(command: to_shell)
+    rescue StandardError => e
+      raise e if e.is_a?(RubyShell::CommandError)
+
+      raise RubyShell::CommandError.new(command: to_shell, message: e.message)
     end
 
     def parsed_args
@@ -51,17 +53,6 @@ module RubyShell
 
         [key, v.is_a?(TrueClass) ? nil : "'#{v}'"].compact.join(" ")
       end.compact
-    end
-  end
-
-  class CommandError < StandardError
-    def initialize(command:, stdout: "", stderr: "", status: "")
-      @command = command
-      @stdout = stdout
-      @stderr = stderr
-      @status = status
-
-      super
     end
   end
 end
