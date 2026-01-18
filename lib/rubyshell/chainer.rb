@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "open3"
+
 module RubyShell
   class Chainer
     attr_reader :parts
@@ -31,7 +33,13 @@ module RubyShell
     end
 
     def exec_commands
-      `#{to_shell}`.chomp
+      Open3.capture3(to_shell).then do |stdout, stderr, status|
+        if status.success?
+          stdout.chomp
+        else
+          raise RubyShell::CommandError.new(command: to_shell, stdout: stdout, stderr: stderr, status: status)
+        end
+      end
     end
 
     def to_shell

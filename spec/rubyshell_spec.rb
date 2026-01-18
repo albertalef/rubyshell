@@ -40,9 +40,8 @@ RSpec.describe RubyShell do
         sh { nonexistingcommand }
       end
 
-      # TODO: Make return a Command Execution Error
       it "retuns a Command Execution Error" do
-        expect { subject_call }.to raise_error(Errno::ENOENT, /No such file or directory/)
+        expect { subject_call }.to raise_error(RubyShell::CommandError)
       end
     end
 
@@ -51,9 +50,8 @@ RSpec.describe RubyShell do
         sh { ls("notexistingfolder") }
       end
 
-      # TODO: Make return a Command Execution Error
       it "retuns a Command Execution Error" do
-        expect { subject_call }.to raise_error(RuntimeError, "Command Failed")
+        expect { subject_call }.to raise_error(RubyShell::CommandError)
       end
     end
 
@@ -124,7 +122,7 @@ RSpec.describe RubyShell do
 
       # TODO: Make return a Command Execution Error
       it "retuns a Command Execution Error" do
-        expect { subject_call }.to raise_error(RuntimeError, "Command Failed")
+        expect { subject_call }.to raise_error(RubyShell::CommandError)
       end
     end
   end

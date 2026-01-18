@@ -2,16 +2,14 @@
 
 module RubyShell
   module Executor
+    module_function
+
     def cd(path, &block)
       Dir.chdir(path, &block)
     end
 
     def chain(&block)
-      result = RubyShell::ChainContext.class_eval(&block).exec_commands
-
-      raise "Command Failed" unless $?.success?
-
-      result
+      RubyShell::ChainContext.class_eval(&block).exec_commands
     end
 
     def method_missing(method_name, *args)
