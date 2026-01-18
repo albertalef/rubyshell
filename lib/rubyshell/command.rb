@@ -16,7 +16,10 @@ module RubyShell
 
     def exec_command
       Open3.capture3(to_shell).then do |stdout, stderr, status|
-        raise RubyShell::CommandError.new(command: to_shell, stdout: stdout, stderr: stderr, status: status) unless status.success?
+        unless status.success?
+          raise RubyShell::CommandError.new(command: to_shell, stdout: stdout, stderr: stderr, status: status)
+        end
+
         stdout.chomp
       end
     rescue StandardError
