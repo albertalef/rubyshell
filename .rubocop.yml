@@ -3,6 +3,7 @@ AllCops:
   TargetRubyVersion: 2.6
   SuggestExtensions: false
 
+
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes
