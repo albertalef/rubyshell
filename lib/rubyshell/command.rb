@@ -22,10 +22,7 @@ module RubyShell
           raise RubyShell::CommandError.new(command: to_shell, stdout: stdout, stderr: stderr, status: status)
         end
 
-        # Perform this check so that rspec doesn't complain
-        return StringWrapper.new(stdout) if $0.match?(INTERACTIVE_SESSION)
-
-        stdout[-1] == "\n" ? stdout[0...-1] : stdout
+        StringWrapper.new(stdout.chomp)
       end
     rescue StandardError
       raise RubyShell::CommandError.new(command: to_shell)
@@ -71,13 +68,11 @@ module RubyShell
   end
 
   class StringWrapper < String
-    # Do this instead of chomp, otherwise IRB
-    # doesn't output properly
     def inspect
-      if to_s[-1] == "\n"
-        to_s[0...-1]
-      else
+      if $0.match?(INTERACTIVE_SESSION)
         to_s
+      else
+        super
       end
     end
   end
