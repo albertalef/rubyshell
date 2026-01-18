@@ -157,7 +157,6 @@ RSpec.describe RubyShell do
       end
     end
   end
-  end
 
   it "has a version number" do
     expect(RubyShell::VERSION).not_to be nil
