@@ -124,6 +124,17 @@ sh do
 end
 ```
 
+### Executing without a block
+The `sh` method can receive any method call, and execute shell commands
+
+```ruby
+sh.puts pwd # => /Users/albertalef/projects/rubyshell
+
+sh.cd 'examples'
+
+puts sh.pwd  # => /Users/albertalef/projects/rubyshell/examples
+```
+
 ## Complete example
 
 ```ruby
