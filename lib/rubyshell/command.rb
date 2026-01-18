@@ -20,7 +20,7 @@ module RubyShell
           raise RubyShell::CommandError.new(command: to_shell, stdout: stdout, stderr: stderr, status: status)
         end
 
-        stdout.chomp
+        StringWrapper.new(stdout.chomp)
       end
     rescue StandardError => e
       raise e if e.is_a?(RubyShell::CommandError)
@@ -53,6 +53,16 @@ module RubyShell
 
         [key, v.is_a?(TrueClass) ? nil : "'#{v}'"].compact.join(" ")
       end.compact
+    end
+  end
+
+  class StringWrapper < String
+    def inspect
+      if $stdin.isatty
+        to_s
+      else
+        super
+      end
     end
   end
 end

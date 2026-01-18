@@ -170,3 +170,25 @@ RSpec.describe RubyShell do
     expect(RubyShell::VERSION).not_to be nil
   end
 end
+
+RSpec.describe RubyShell::StringWrapper do
+  describe "#inspect" do
+    let(:wrapper) { RubyShell::StringWrapper.new("hello\nworld") }
+
+    context "when STDIN is a TTY (interactive session)" do
+      before { allow($stdin).to receive(:isatty).and_return(true) }
+
+      it "returns the raw string for cleaner IRB output" do
+        expect(wrapper.inspect).to eq("hello\nworld")
+      end
+    end
+
+    context "when STDIN is not a TTY (non-interactive)" do
+      before { allow($stdin).to receive(:isatty).and_return(false) }
+
+      it "returns the standard String#inspect format" do
+        expect(wrapper.inspect).to eq('"hello\nworld"')
+      end
+    end
+  end
+end
