@@ -20,7 +20,7 @@ module RubyShell
           raise RubyShell::CommandError.new(command: to_shell, stdout: stdout, stderr: stderr, status: status)
         end
 
-        stdout.chomp
+        StringWrapper.new(stdout)
       end
     rescue StandardError
       raise RubyShell::CommandError.new(command: to_shell)
@@ -62,6 +62,17 @@ module RubyShell
       @status = status
 
       super
+    end
+  end
+
+  class StringWrapper
+    def initialize(string) = @string = string
+    def to_s = @string
+    def to_str = @string
+    def inspect = @string
+
+    def method_missing(method_name, *args, **kwargs, &block)
+      @string.send(method_name, *args, **kwargs, &block)
     end
   end
 end
