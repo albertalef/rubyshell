@@ -6,8 +6,11 @@
 /pkg/
 /spec/reports/
 /tmp/
+/build/
 
 # rspec failure tracking
 .rspec_status
+
+.irbrc
 
 rubyshell-*.gem

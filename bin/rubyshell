@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "rubyshell"
+
+if ARGV.first&.strip&.start_with? "exec"
+  extend RubyShell::Executor # rubocop:disable Style/MixinUsage
+
+  load(ARGV.last)
+end

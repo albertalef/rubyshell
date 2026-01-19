@@ -1,8 +1,0 @@
-#!/usr/bin/env ruby
-# frozen_string_literal: true
-
-require "rubyshell"
-
-require "irb"
-
-IRB.start(__FILE__)
