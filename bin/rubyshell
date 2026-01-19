@@ -3,6 +3,8 @@
 
 require "rubyshell"
 
-require "irb"
+if ARGV.first&.strip&.start_with? "exec"
+  extend RubyShell::Executor # rubocop:disable Style/MixinUsage
 
-IRB.start(__FILE__)
+  load(ARGV.last)
+end
