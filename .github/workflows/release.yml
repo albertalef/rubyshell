@@ -1,0 +1,70 @@
+name: Build + Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release-github:
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/tamatebako/tebako-ubuntu-20.04:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Build
+        shell: sh
+        run: |
+          set -eu
+          mkdir -p dist
+
+          tebako press --root='.' --entry-point='rubyshell' --output='./dist/rubyshell'
+
+          ls -lah dist
+
+      - name: Checksums
+        shell: sh
+        run: |
+          set -eu
+          (cd dist && sha256sum * > SHA256SUMS.txt) || true
+          ls -lah dist
+
+      - name: Upload dist as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.run_id }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish GitHub Release + upload assets
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: |
+            dist/*
+
+  release-rubygems:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          ruby-version: ruby
+
+      - uses: rubygems/release-gem@v1
