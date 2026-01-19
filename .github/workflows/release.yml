@@ -41,7 +41,7 @@ jobs:
       - name: Upload dist as workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ github.ref_name }}
+          name: dist-${{ github.run_id }}
           path: dist/
           if-no-files-found: error
           retention-days: 14
