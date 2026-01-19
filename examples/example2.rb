@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require "rubyshell"
-require "securerandom"
 
 sh do
   puts pwd # => /Users/albertalef/projects/rubyshell
