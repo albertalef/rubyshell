@@ -23,12 +23,12 @@ Gem::Specification.new do |spec|
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
-  spec.files = Dir["CHANGELOG.md", "{lib,exe}/**/*", "LICENSE.md", "Rakefile", "README.md"]
+  spec.files = Dir["CHANGELOG.md", "{lib,bin}/**/*", "LICENSE.md", "Rakefile", "README.md"]
 
   spec.require_paths = ["lib"]
 
-  spec.bindir = "exe"
-  spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
+  spec.bindir = "bin"
+  spec.executables << "rubyshell"
 
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
