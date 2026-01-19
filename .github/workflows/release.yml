@@ -55,6 +55,7 @@ jobs:
 
   release-rubygems:
     runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
 
     steps:
       - uses: actions/checkout@v5
