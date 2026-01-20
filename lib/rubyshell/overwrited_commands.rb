@@ -13,5 +13,9 @@ module RubyShell
     def ls(*args)
       method_missing(:ls, *args)
     end
+
+    def clear
+      print method_missing(:clear)
+    end
   end
 end

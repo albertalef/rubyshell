@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../../rubyshell"
+
 module RubyShell
   module Tty
     module IrbWorkspace
