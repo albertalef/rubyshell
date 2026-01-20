@@ -1,10 +1,17 @@
 # frozen_string_literal: true
 
+require "debug"
+
 module RubyShell
   module Tty
     module IrbWorkspace
       def initialize(*args, **kwargs)
         super
+
+        main.define_singleton_method(:to_s) do
+          Dir.pwd.split("/").last(2).join("/")
+        end
+
         @main.extend(RubyShell::Executor)
       end
     end
