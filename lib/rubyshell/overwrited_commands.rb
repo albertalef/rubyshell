@@ -11,7 +11,7 @@ module RubyShell
     end
 
     def ls(*args)
-      method_missing(*args)
+      method_missing(:ls, *args)
     end
   end
 end
