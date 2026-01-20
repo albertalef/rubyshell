@@ -9,9 +9,5 @@ module RubyShell
     def cd(path, &block)
       Dir.chdir(path, &block)
     end
-
-    def ls(*args)
-      method_missing(:ls, *args)
-    end
   end
 end
