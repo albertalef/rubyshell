@@ -3,6 +3,7 @@
 
 require_relative "../lib/rubyshell"
 
+# Inspired on: https://www.reddit.com/r/hyprland/comments/1qfrpt2/my_very_lightweight_ocr_setup_with_tesseract/
 sh do
   positions = slurp
   image = grim("-g", positions.quoted, "-")
