@@ -1,6 +1,7 @@
 module RubyShell
   module Sanitizer
     SAFE_REGEX = /"/
+
     # Inspired on https://github.com/ruby/shellwords/blob/master/lib/shellwords.rb
     def self.sanitize_to_shell(string)
       return unless string
@@ -9,11 +10,10 @@ module RubyShell
 
       string = string.to_s.dup
 
-      if string.match?(/\A(["'])(.*)\1\z/m) # starts+ends with same quote
-        q = string[0] # " or '
-        inner = string[1..-2] # content without the outer quotes
+      if string.match?(/\A(["'])(.*)\1\z/m)
+        inner = string[1..-2]
 
-        inner.gsub!(SAFE_REGEX) { |ch| "\\#{ch}" } # escape matches
+        inner.gsub!(SAFE_REGEX) { |ch| "\\#{ch}" }
 
         string.replace("\"#{inner}\"")
       else
