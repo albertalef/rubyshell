@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
-require "open3"
-
 module RubyShell
   class Chainer
     attr_reader :parts
 
-    def initialize(command)
+    def initialize(command, options = {})
       @parts = [command]
+      @options = options
     end
 
     def handle_chain(operator, chainer)
@@ -33,17 +32,7 @@ module RubyShell
     end
 
     def exec_commands
-      Open3.capture3(to_shell).then do |stdout, stderr, status|
-        unless status.success?
-          raise RubyShell::CommandError.new(command: to_shell, stdout: stdout, stderr: stderr, status: status)
-        end
-
-        stdout.chomp
-      end
-    rescue StandardError => e
-      raise e if e.is_a?(RubyShell::CommandError)
-
-      raise RubyShell::CommandError.new(command: to_shell, message: e.message)
+      RubyShell::TerminalExecutor.capture(to_shell, @options)
     end
 
     def to_shell

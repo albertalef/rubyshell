@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
-require "open3"
-
 module RubyShell
   class Command
     def initialize(command_name, *args, &block)
       @command_name = command_name
       @args = args
+      @options = extract_options(args)
       @block = block
     end
 
@@ -15,17 +14,7 @@ module RubyShell
     end
 
     def exec_command
-      Open3.capture3(to_shell).then do |stdout, stderr, status|
-        unless status.success?
-          raise RubyShell::CommandError.new(command: to_shell, stdout: stdout, stderr: stderr, status: status)
-        end
-
-        StringWrapper.new(stdout.chomp)
-      end
-    rescue StandardError => e
-      raise e if e.is_a?(RubyShell::CommandError)
-
-      raise RubyShell::CommandError.new(command: to_shell, message: e.message)
+      RubyShell::TerminalExecutor.capture(to_shell, @options)
     end
 
     def parsed_args
@@ -34,35 +23,46 @@ module RubyShell
         when Hash
           map_hash_arg(arg)
         else
-          arg.to_s
+          RubyShell::Sanitizer.sanitize_to_shell(arg.to_s)
         end
       end.flatten
     end
 
     private
 
+    def extract_options(args)
+      args.reduce({}) do |acc, value|
+        next acc unless value.is_a?(Hash)
+
+        acc.merge(value)
+      end
+    end
+
     def map_hash_arg(arg)
       arg.map do |k, v|
         next if k.start_with?("_")
 
-        key = if k.length == 1
-                "-#{k}"
-              else
-                "--#{k}"
-              end
-
-        [key, v.is_a?(TrueClass) ? nil : "'#{v}'"].compact.join(" ")
+        if v.is_a?(Array)
+          v.map do |e|
+            map_hash_entry_to_string(k, e)
+          end.join(" ")
+        else
+          map_hash_entry_to_string(k, v)
+        end
       end.compact
     end
-  end
 
-  class StringWrapper < String
-    def inspect
-      if $stdin.isatty
-        to_s
-      else
-        super
-      end
+    def map_hash_entry_to_string(key, value)
+      key_string = if key.length == 1
+                     "-#{key}"
+                   else
+                     "--#{key}"
+                   end
+
+      [
+        key_string,
+        value.is_a?(TrueClass) ? nil : RubyShell::Sanitizer.sanitize_to_shell("'#{value}'")
+      ].compact.join(" ")
     end
   end
 end

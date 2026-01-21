@@ -7,13 +7,24 @@ require_relative "rubyshell/chain_context"
 require_relative "rubyshell/overwrited_commands"
 require_relative "rubyshell/executor"
 require_relative "rubyshell/error"
+require_relative "rubyshell/results/string_result"
+require_relative "rubyshell/terminal_executor"
+require_relative "rubyshell/sanitizer"
 
 module Kernel
-  def sh(&block)
-    if block.nil?
+  def sh(command = nil, *args, &block)
+    if command
+      RubyShell::Executor.send(command, *args)
+    elsif block.nil?
       RubyShell::Executor
     else
       RubyShell::Executor.class_eval(&block)
     end
+  end
+end
+
+class String
+  def quoted
+    "\"#{self}\""
   end
 end
