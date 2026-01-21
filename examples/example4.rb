@@ -5,21 +5,17 @@ require_relative "../lib/rubyshell"
 
 sh do
   positions = slurp
+  image = grim("-g", positions.quoted, "-")
 
-  content = chain do
-    grim("-g", positions.quoted, "-") | tesseract(
-      "- stdout",
-      oem: 1,
-      psm: 6,
-      c: [
-        "load_system_dawg=1",
-        "load_freq_dawg=1",
-        'tessedit_char_blacklist="¦"'
-      ]
-    )
-  end
+  content = tesseract(
+    "- stdout",
+    oem: 1,
+    psm: 6,
+    c: ["load_system_dawg=1", "load_freq_dawg=1", 'tessedit_char_blacklist="¦"'],
+    _stdin: image
+  )
 
-  chain { echo("-n", content.quoted) | sh("wl-copy") }
+  sh("wl-copy", _stdin: content)
 
   sh(
     "notify-send",

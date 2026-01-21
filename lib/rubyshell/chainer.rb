@@ -35,6 +35,8 @@ module RubyShell
       RubyShell::TerminalExecutor.capture(to_shell, @options)
     end
 
+    alias exec exec_commands
+
     def to_shell
       parts.map do |part|
         if part.is_a?(RubyShell::Command)

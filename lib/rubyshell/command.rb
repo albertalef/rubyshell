@@ -17,6 +17,8 @@ module RubyShell
       RubyShell::TerminalExecutor.capture(to_shell, @options)
     end
 
+    alias exec exec_command
+
     def parsed_args
       @args.map do |arg|
         case arg
@@ -29,6 +31,18 @@ module RubyShell
     end
 
     private
+
+    def method_missing(method_name, *args, &block)
+      if method_name.start_with?(/[^A-Za-z0-9]/)
+        RubyShell::Chainer.new(self).send(method_name, *args, block)
+      else
+        super
+      end
+    end
+
+    def respond_to_missing?(_name, _include_private)
+      false
+    end
 
     def extract_options(args)
       args.reduce({}) do |acc, value|

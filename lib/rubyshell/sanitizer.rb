@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module RubyShell
   module Sanitizer
-    SAFE_REGEX = /"/
+    SAFE_REGEX = /"/.freeze
 
     # Inspired on https://github.com/ruby/shellwords/blob/master/lib/shellwords.rb
-    def self.sanitize_to_shell(string)
+    def self.sanitize_to_shell(string) # rubocop:disable Metrics/MethodLength
       return unless string
 
       raise ArgumentError, "NUL character" if string.index("\0")
@@ -19,8 +21,6 @@ module RubyShell
       else
         string.gsub!(SAFE_REGEX) { |ch| "\\#{ch}" }
       end
-
-      string.gsub!("\n", "'\n'")
 
       string
     end

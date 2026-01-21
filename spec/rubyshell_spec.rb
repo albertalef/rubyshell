@@ -77,6 +77,22 @@ RSpec.describe RubyShell do
         expect(Dir["../*"]).to eq(["../example-folder"])
       end
     end
+
+    context "when execute outside a tty" do
+      before { allow($stdin).to receive(:isatty).and_return(false) }
+
+      it "returns the raw string for cleaner IRB output" do
+        expect(sh.echo("hello\nworld".quoted).inspect).to eq('"hello\nworld"')
+      end
+    end
+
+    context "when execution in a tty" do
+      before { allow($stdin).to receive(:isatty).and_return(true) }
+
+      it "returns the raw string for cleaner IRB output" do
+        expect(sh.echo("hello\nworld".quoted).inspect).to eq("hello\nworld")
+      end
+    end
   end
 
   describe "Validating Chains" do
@@ -84,6 +100,30 @@ RSpec.describe RubyShell do
       def subject_call
         sh do
           chain { ls | wc("-l") }
+        end
+      end
+
+      it "returns an string" do
+        expect(subject_call.strip).to eq("0")
+      end
+    end
+
+    context "when counting files in current folder using bang pattern" do
+      def subject_call
+        sh do
+          (ls! | wc!("-l")).exec
+        end
+      end
+
+      it "returns an string" do
+        expect(subject_call.strip).to eq("0")
+      end
+    end
+
+    context "when using bang to execute the chain" do
+      def subject_call
+        sh do
+          !(ls! | wc!("-l"))
         end
       end
 
@@ -139,7 +179,7 @@ RSpec.describe RubyShell do
       let(:subject_instance) { RubyShell::Command.new("example", firstparam: "Short Phrase") }
 
       it "returns the correct shell command" do
-        expect(subject_instance.to_shell).to eq("example --firstparam 'Short Phrase'")
+        expect(subject_instance.to_shell).to eq("example --firstparam \"Short Phrase\"")
       end
     end
   end
@@ -168,27 +208,5 @@ RSpec.describe RubyShell do
 
   it "has a version number" do
     expect(RubyShell::VERSION).not_to be nil
-  end
-end
-
-RSpec.describe RubyShell::StringWrapper do
-  describe "#inspect" do
-    let(:wrapper) { RubyShell::StringWrapper.new("hello\nworld") }
-
-    context "when STDIN is a TTY (interactive session)" do
-      before { allow($stdin).to receive(:isatty).and_return(true) }
-
-      it "returns the raw string for cleaner IRB output" do
-        expect(wrapper.inspect).to eq("hello\nworld")
-      end
-    end
-
-    context "when STDIN is not a TTY (non-interactive)" do
-      before { allow($stdin).to receive(:isatty).and_return(false) }
-
-      it "returns the standard String#inspect format" do
-        expect(wrapper.inspect).to eq('"hello\nworld"')
-      end
-    end
   end
 end
