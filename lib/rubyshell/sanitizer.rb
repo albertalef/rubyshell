@@ -5,7 +5,7 @@ module RubyShell
     SAFE_REGEX = /"/.freeze
 
     # Inspired on https://github.com/ruby/shellwords/blob/master/lib/shellwords.rb
-    def self.sanitize_to_shell(string) # rubocop:disable Metrics/MethodLength
+    def self.sanitize_to_shell(string)
       return unless string
 
       raise ArgumentError, "NUL character" if string.index("\0")

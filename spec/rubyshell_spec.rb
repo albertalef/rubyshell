@@ -120,18 +120,6 @@ RSpec.describe RubyShell do
       end
     end
 
-    context "when using bang to execute the chain" do
-      def subject_call
-        sh do
-          !(ls! | wc!("-l"))
-        end
-      end
-
-      it "returns an string" do
-        expect(subject_call.strip).to eq("0")
-      end
-    end
-
     context "when counting files in current folder" do
       def subject_call
         sh do

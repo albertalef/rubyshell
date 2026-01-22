@@ -6,7 +6,7 @@ module RubyShell
   module TerminalExecutor
     SELECT_TIMEOUT = Rational(1, 20).freeze
 
-    def self.capture(command, options) # rubocop:disable Metris/MethodLength,Metrics/CyclomaticComplexity,Metrix/AbcSize
+    def self.capture(command, options) # rubocop:disable Metris/MethodLength,Metrics/CyclomaticComplexity,Metrix/AbcSize,Metrics/PerceivedComplexity
       stdin_value = if options[:_stdin].is_a?(RubyShell::Command) || options[:_stdin].is_a?(RubyShell::Chainer)
                       options[:_stdin].exec
                     else
@@ -65,11 +65,11 @@ module RubyShell
         end
 
         RubyShell::Results::StringResult.new(output.chomp)
-      rescue StandardError => e
-        raise e if e.is_a?(RubyShell::CommandError)
-
-        raise RubyShell::CommandError.new(command: command, message: e.message)
       end
+    rescue StandardError => e
+      raise e if e.is_a?(RubyShell::CommandError)
+
+      raise RubyShell::CommandError.new(command: command, message: e.message)
     end
   end
 end
