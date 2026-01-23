@@ -3,7 +3,7 @@
 require "tmpdir"
 require "debug"
 
-RSpec.describe RubyShell do
+RSpec.describe RubyShell do # rubocop:disable Metrics/BlockLength
   around(:example) do |example|
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) { example.run }
@@ -170,9 +170,105 @@ RSpec.describe RubyShell do
         expect(subject_instance.to_shell).to eq("example --firstparam \"Short Phrase\"")
       end
     end
+
+    context "when pass stgin in args as string" do
+      def subject_call
+        sh do
+          wc("-l", _stdin: "3\n3\n")
+        end
+      end
+
+      it "returns an string" do
+        expect(subject_call.strip).to eq("2")
+      end
+    end
+
+    context "when pass stgin in args as command" do
+      def subject_call
+        sh do
+          wc("-l", _stdin: echo!("3\n3\n".quoted))
+        end
+      end
+
+      it "returns an string" do
+        expect(subject_call.strip).to eq("2")
+      end
+    end
+
+    context "when pass hash arg with array as value" do
+      def subject_call
+        sh do
+          sed!(e: %w[one two three]).to_shell
+        end
+      end
+
+      it "returns the correct command" do
+        expect(subject_call).to eq("sed -e \"one\" -e \"two\" -e \"three\"")
+      end
+    end
+
+    context "when call the command with a bang" do
+      def subject_call
+        sh do
+          echo! "oi", e: %w[a b], _stdin: "oi"
+        end
+      end
+
+      it "returns a command class" do
+        expect(subject_call).to be_a_instance_of(RubyShell::Command)
+      end
+
+      it "returns the correct shell" do
+        expect(subject_call.to_shell).to eq("echo oi -e \"a\" -e \"b\"")
+      end
+
+      it "preserves the arguments" do
+        expect(subject_call.options).to include(
+          _stdin: "oi"
+        )
+      end
+    end
   end
 
   describe "Validating Executor Module" do
+    context "whe using sh method to execute a command as param" do
+      def subject_call
+        sh("mkdir", "example-folder")
+        sh("cd", "example-folder")
+        sh("pwd")
+      end
+
+      it "retuns the correct filepath" do
+        expect(subject_call).to include("/example-folder")
+      end
+
+      it "creates a new folder named example-folder" do
+        subject_call
+
+        expect(Dir["../*"]).to eq(["../example-folder"])
+      end
+    end
+
+    context "whe using sh method to execute a command as param inside another sh block" do
+      def subject_call
+        sh do
+          sh("mkdir", "example-folder")
+          sh("cd", "example-folder")
+          sh("pwd")
+        end
+      end
+
+      it "retuns the correct filepath" do
+        expect(subject_call).to include("/example-folder")
+      end
+
+      it "creates a new folder named example-folder" do
+        subject_call
+
+        expect(Dir["../*"]).to eq(["../example-folder"])
+      end
+    end
+
     context "when extending module" do
       def subject_call
         extend RubyShell::Executor

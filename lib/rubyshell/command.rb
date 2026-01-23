@@ -2,6 +2,8 @@
 
 module RubyShell
   class Command
+    attr_accessor :command_name, :options
+
     def initialize(command_name, *args, &block)
       @command_name = command_name
       @args = args
