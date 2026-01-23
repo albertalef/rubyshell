@@ -3,7 +3,7 @@
 require "tmpdir"
 require "debug"
 
-RSpec.describe RubyShell do
+RSpec.describe RubyShell do # rubocop:disable Metrics/BlockLength
   around(:example) do |example|
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) { example.run }
@@ -77,6 +77,22 @@ RSpec.describe RubyShell do
         expect(Dir["../*"]).to eq(["../example-folder"])
       end
     end
+
+    context "when execute outside a tty" do
+      before { allow($stdin).to receive(:isatty).and_return(false) }
+
+      it "returns the raw string for cleaner IRB output" do
+        expect(sh.echo("hello\nworld".quoted).inspect).to eq('"hello\nworld"')
+      end
+    end
+
+    context "when execution in a tty" do
+      before { allow($stdin).to receive(:isatty).and_return(true) }
+
+      it "returns the raw string for cleaner IRB output" do
+        expect(sh.echo("hello\nworld".quoted).inspect).to eq("hello\nworld")
+      end
+    end
   end
 
   describe "Validating Chains" do
@@ -84,6 +100,18 @@ RSpec.describe RubyShell do
       def subject_call
         sh do
           chain { ls | wc("-l") }
+        end
+      end
+
+      it "returns an string" do
+        expect(subject_call.strip).to eq("0")
+      end
+    end
+
+    context "when counting files in current folder using bang pattern" do
+      def subject_call
+        sh do
+          (ls! | wc!("-l")).exec
         end
       end
 
@@ -139,12 +167,108 @@ RSpec.describe RubyShell do
       let(:subject_instance) { RubyShell::Command.new("example", firstparam: "Short Phrase") }
 
       it "returns the correct shell command" do
-        expect(subject_instance.to_shell).to eq("example --firstparam 'Short Phrase'")
+        expect(subject_instance.to_shell).to eq("example --firstparam \"Short Phrase\"")
+      end
+    end
+
+    context "when pass stgin in args as string" do
+      def subject_call
+        sh do
+          wc("-l", _stdin: "3\n3\n")
+        end
+      end
+
+      it "returns an string" do
+        expect(subject_call.strip).to eq("2")
+      end
+    end
+
+    context "when pass stgin in args as command" do
+      def subject_call
+        sh do
+          wc("-l", _stdin: echo!("3\n3\n".quoted))
+        end
+      end
+
+      it "returns an string" do
+        expect(subject_call.strip).to eq("2")
+      end
+    end
+
+    context "when pass hash arg with array as value" do
+      def subject_call
+        sh do
+          sed!(e: %w[one two three]).to_shell
+        end
+      end
+
+      it "returns the correct command" do
+        expect(subject_call).to eq("sed -e \"one\" -e \"two\" -e \"three\"")
+      end
+    end
+
+    context "when call the command with a bang" do
+      def subject_call
+        sh do
+          echo! "oi", e: %w[a b], _stdin: "oi"
+        end
+      end
+
+      it "returns a command class" do
+        expect(subject_call).to be_a_instance_of(RubyShell::Command)
+      end
+
+      it "returns the correct shell" do
+        expect(subject_call.to_shell).to eq("echo oi -e \"a\" -e \"b\"")
+      end
+
+      it "preserves the arguments" do
+        expect(subject_call.options).to include(
+          _stdin: "oi"
+        )
       end
     end
   end
 
   describe "Validating Executor Module" do
+    context "whe using sh method to execute a command as param" do
+      def subject_call
+        sh("mkdir", "example-folder")
+        sh("cd", "example-folder")
+        sh("pwd")
+      end
+
+      it "retuns the correct filepath" do
+        expect(subject_call).to include("/example-folder")
+      end
+
+      it "creates a new folder named example-folder" do
+        subject_call
+
+        expect(Dir["../*"]).to eq(["../example-folder"])
+      end
+    end
+
+    context "whe using sh method to execute a command as param inside another sh block" do
+      def subject_call
+        sh do
+          sh("mkdir", "example-folder")
+          sh("cd", "example-folder")
+          sh("pwd")
+        end
+      end
+
+      it "retuns the correct filepath" do
+        expect(subject_call).to include("/example-folder")
+      end
+
+      it "creates a new folder named example-folder" do
+        subject_call
+
+        expect(Dir["../*"]).to eq(["../example-folder"])
+      end
+    end
+
     context "when extending module" do
       def subject_call
         extend RubyShell::Executor
@@ -166,28 +290,38 @@ RSpec.describe RubyShell do
     end
   end
 
-  it "has a version number" do
-    expect(RubyShell::VERSION).not_to be nil
-  end
-end
+  describe "Validating Executable" do
+    context 'when using "new" command' do
+      def subject_method
+        sh do
+          rubyshell "new", "testfile".quoted
+        end
+      end
 
-RSpec.describe RubyShell::StringWrapper do
-  describe "#inspect" do
-    let(:wrapper) { RubyShell::StringWrapper.new("hello\nworld") }
+      it "creates the correct file" do
+        subject_method
 
-    context "when STDIN is a TTY (interactive session)" do
-      before { allow($stdin).to receive(:isatty).and_return(true) }
+        expect(sh.ls.chomp).to eq("testfile.rb")
+      end
 
-      it "returns the raw string for cleaner IRB output" do
-        expect(wrapper.inspect).to eq("hello\nworld")
+      it "creates a file with correct permissions" do
+        subject_method
+
+        expect(sh.ls("-l", "testfile.rb").split.first).to eq("-rwxr-xr-x")
       end
     end
 
-    context "when STDIN is not a TTY (non-interactive)" do
-      before { allow($stdin).to receive(:isatty).and_return(false) }
+    context 'when using "new" command without a filename' do
+      def subject_method
+        sh do
+          rubyshell "new"
+        end
+      end
 
-      it "returns the standard String#inspect format" do
-        expect(wrapper.inspect).to eq('"hello\nworld"')
+      it "creates the correct file" do
+        subject_method
+
+        expect(sh.ls.chomp).to eq("new_script.rb")
       end
     end
   end

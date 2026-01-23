@@ -7,4 +7,12 @@ if ARGV.first&.strip&.start_with? "exec"
   extend RubyShell::Executor # rubocop:disable Style/MixinUsage
 
   load(ARGV.last)
+elsif ARGV.first&.strip&.start_with? "new"
+  file_name = "#{ARGV.last.gsub(".rb", "")}.rb" if ARGV.size > 1
+  file_name ||= "new_script.rb"
+
+  sh do
+    touch file_name
+    chmod "+x", file_name
+  end
 end

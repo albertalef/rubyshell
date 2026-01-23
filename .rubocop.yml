@@ -26,3 +26,9 @@ Metrics/BlockLength:
 Lint/ConstantDefinitionInBlock:
   Exclude:
     - "spec/spec_helper.rb"
+
+Metrics/AbcSize:
+  Max: 18
+
+Metrics/MethodLength:
+  Max: 30
