@@ -21,9 +21,9 @@
   <p align="center">
     <a href="#installation">Installation</a>
     ·
-    <a href="#why-rubyshell">Why RubyShell?</a>
-    ·
     <a href="#usage">Usage</a>
+    ·
+    <a href="https://github.com/albertalef/rubyshell/wiki">Wiki</a>
     ·
     <a href="#real-world-examples">Examples</a>
     ·
@@ -360,7 +360,7 @@ end
 
 ## Documentation
 
-See [USAGE.md](USAGE.md) for complete documentation including all options and advanced features.
+See [Wiki](https://github.com/albertalef/rubyshell/wiki) for complete documentation including all options and advanced features.
 
 ## Development
 
