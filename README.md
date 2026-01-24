@@ -2,7 +2,7 @@
   <img alt="RubyShell" src="./docs/images/rubyshelllogo.png" width="60%">
 </h1>
 
-<h3 align="center">✨ Rubist way to create shell scripts ✨</h3>
+<h3 align="center">The Rubyist way to write shell scripts</h3>
 
 <p align="center">
   <a href="https://rubygems.org/gems/rubyshell">
@@ -21,13 +21,13 @@
   <p align="center">
     <a href="#installation">Installation</a>
     ·
+    <a href="#why-rubyshell">Why RubyShell?</a>
+    ·
     <a href="#usage">Usage</a>
     ·
-    <a href="#complete-example">Examples</a>
+    <a href="#real-world-examples">Examples</a>
     ·
     <a href="#contributing">Contributing</a>
-    ·
-    <a href="#sponsors">Sponsors</a>
   </p>
 </p>
 <br />
@@ -41,162 +41,339 @@
   end
 ```
 
-Yes, that’s valid Ruby!
+Yes, that's valid Ruby!
 `ls` and `cat` are just shell commands, but **RubyShell** makes them behave like Ruby methods.
 
 ## Installation
 
-Install the gem and add to the application's Gemfile by executing:
+```bash
+bundle add rubyshell
+```
 
-    $ bundle add rubyshell
+Or install directly:
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+```bash
+gem install rubyshell
+```
 
-    $ gem install rubyshell
+## Why RubyShell?
+
+### The Problem
+
+Ever written something like this?
+
+```bash
+# Bash: Find large files modified in the last 7 days, show top 10 with human sizes
+find . -type f -mtime -7 -exec ls -lh {} \; 2>/dev/null | \
+  awk '{print $5, $9}' | \
+  sort -hr | \
+  head -10
+```
+
+Or tried to do error handling in bash?
+
+```bash
+# Bash: Hope nothing goes wrong...
+output=$(some_command 2>&1) || echo "failed somehow"
+```
+
+### The Solution
+
+```ruby
+sh do
+  # Ruby + Shell: Same task, actually readable
+  find(".", type: "f", mtime: "-7")
+    .lines
+    .map { |f| [File.size(f.strip), f.strip] }
+    .sort_by { |size, _| -size }
+    .first(10)
+    .each { |size, file| puts "#{size / 1024}KB  #{file}" }
+rescue RubyShell::CommandError => e
+  puts "Failed: #{e.message}"
+  puts "Exit code: #{e.status}"
+end
+```
 
 ## Usage
 
-### Calling a shell command
-With RubyShell, every shell command can be used inside the ruby, you just need to call
+### Basic Commands
+
+```ruby
+require 'rubyshell'
+
+sh do
+  pwd                        # Run any command
+  ls("-la")                  # With arguments
+  mkdir("project")           # Create directories
+  docker("ps", all: true)    # --all flag
+  git("status", s: true)     # -s flag
+end
+
+# Or chain directly
+sh.git("log", oneline: true, n: 5)
+```
+
+### Pipelines
 
 ```ruby
 sh do
-  puts pwd # => /Users/albertalef/projects/rubyshell
+  # Using chain block
+  chain { cat("access.log") | grep("ERROR") | wc("-l") }
+
+  # Using bang pattern
+  (cat!("data.csv") | sort! | uniq!).exec
 end
 ```
 
-### Using without the block
-If you want to start an irb or pry session, and run commands as first-class citizens then do the following.
-
-```ruby
-extend RubyShell::Executor
-
-pwd # => /Users/albertalef/projects/rubyshell
-```
-
-### Passing arguments
-Here we have different ways to pass arguments to a command.
-You can separate strings, use only one, use hashes, anyway will work
+### Directory Scoping
 
 ```ruby
 sh do
-  docker("ps", all: true) # Using hash syntax = docker ps --all
-
-  docker("ps", a: true) # Using hash syntax = docker ps -a
-
-  docker("ps", '-a') # Passing multiple strings = docker ps -a
-
-  docker("ps -a") # Passing one string = docker ps -a
+  cd "/var/log" do
+    # Commands run here, then return to original dir
+    tail("-n", "100", "syslog")
+  end
+  # Back to original directory
 end
 ```
 
-### Changing folder
-Has two possible ways, changing the folder of the code, or running code only inside a folder 
+### Error Handling
 
-##### Chaging code folder
 ```ruby
 sh do
-  puts pwd # => /Users/albertalef/projects/rubyshell
-
-  cd 'examples'
-
-  puts pwd  # => /Users/albertalef/projects/rubyshell/examples
+  begin
+    rm("-rf", "important_folder")
+  rescue RubyShell::CommandError => e
+    puts "Command: #{e.command}"
+    puts "Stderr: #{e.stderr}"
+    puts "Exit code: #{e.status}"
+  end
 end
 ```
 
-##### Executing code inside another folder
+## Real-World Examples
+
+### Git Workflow Automation
 
 ```ruby
 sh do
-  cd 'examples' do
-    puts pwd  # => /Users/albertalef/projects/rubyshell/examples
+  # Stash changes, pull, pop, and show what changed
+  changes = git("status", porcelain: true).lines
+
+  if changes.any?
+    puts "Stashing #{changes.count} changed files..."
+    git("stash")
+    git("pull", rebase: true)
+    git("stash", "pop")
+  else
+    git("pull", rebase: true)
   end
 
-  puts pwd  # => /Users/albertalef/projects/rubyshell
+  # Show recent commits by author
+  git("log", oneline: true, n: 100)
+    .lines
+    .map { |line| `git show -s --format='%an' #{line.split.first}`.strip }
+    .tally
+    .sort_by { |_, count| -count }
+    .first(5)
+    .each { |author, count| puts "#{author}: #{count} commits" }
 end
 ```
 
-### Chaining commands
-The `chain` method make possible we use shell operators inside the ruby, like `& && | > >> < <<`
+### Log Analysis
 
 ```ruby
 sh do
-  chain { echo "Dummy text" >> "dummy.txt" }
-  
-  puts cat("dummy.txt") # => "Dummy text"
-end
-
-sh do
-  number_of_files = chain { ls | wc('-l') }.chomp
-
-  puts number_of_files # => 5
+  cd "/var/log" do
+    # Parse nginx logs: top 10 IPs by request count
+    cat("nginx/access.log")
+      .lines
+      .map { |line| line.split.first }  # Extract IP
+      .tally
+      .sort_by { |_, count| -count }
+      .first(10)
+      .each { |ip, count| puts "#{ip.ljust(15)} #{count} requests" }
+  end
 end
 ```
 
-### Executing without a block
-The `sh` method can receive any method call, and execute shell commands
+### Docker Cleanup
 
 ```ruby
-sh.puts pwd # => /Users/albertalef/projects/rubyshell
+sh do
+  # Remove containers that exited more than a day ago
+  containers = docker("ps", a: true, format: "{{.ID}} {{.Status}}")
+    .lines
+    .select { |line| line.include?("Exited") }
+    .map { |line| line.split.first }
 
-sh.cd 'examples'
+  if containers.any?
+    puts "Removing #{containers.count} dead containers..."
+    docker("rm", *containers)
+  end
 
-puts sh.pwd  # => /Users/albertalef/projects/rubyshell/examples
+  # Remove dangling images
+  images = docker("images", f: "dangling=true", q: true).lines.map(&:strip)
+
+  if images.any?
+    puts "Removing #{images.count} dangling images..."
+    docker("rmi", *images)
+  end
+
+  puts "Disk usage:"
+  puts docker("system", "df")
+end
 ```
 
-## Complete example
+### Batch File Processing
+
+```ruby
+sh do
+  # Convert all PNGs to WebP, preserving directory structure
+  find(".", name: "*.png")
+    .lines
+    .map(&:strip)
+    .each do |png|
+      webp = png.sub(/\.png$/, ".webp")
+      puts "Converting: #{png}"
+
+      begin
+        cwebp("-q", "80", png, o: webp)
+        rm(png)
+      rescue RubyShell::CommandError => e
+        puts "  Failed: #{e.message}"
+      end
+    end
+end
+```
+
+### System Health Check
+
+```ruby
+sh do
+  puts "=== System Health ==="
+
+  # Disk usage warnings
+  df("-h")
+    .lines
+    .drop(1)
+    .each do |line|
+      parts = line.split
+      usage = parts[4].to_i
+      mount = parts[5]
+      puts "WARNING: #{mount} at #{usage}%" if usage > 80
+    end
+
+  # Memory info
+  mem = cat("/proc/meminfo")
+    .lines
+    .first(3)
+    .to_h { |l| k, v = l.split(":"); [k, v.strip] }
+
+  puts "\nMemory: #{mem['MemAvailable']} available of #{mem['MemTotal']}"
+
+  # Top 5 CPU consumers
+  puts "\nTop CPU processes:"
+  ps("aux", sort: "-%cpu")
+    .lines
+    .drop(1)
+    .first(5)
+    .each { |proc| puts "  #{proc.split[10]}% - #{proc.split[10..-1].join(' ').slice(0, 40)}" }
+end
+```
+
+### Interactive Script with Confirmation
+
+```ruby
+sh do
+  files = find(".", name: "*.tmp", mtime: "+30").lines.map(&:strip)
+
+  if files.empty?
+    puts "No old temp files found."
+    exit
+  end
+
+  puts "Found #{files.count} temp files older than 30 days:"
+  files.first(10).each { |f| puts "  #{f}" }
+  puts "  ... and #{files.count - 10} more" if files.count > 10
+
+  total_size = files.sum { |f| File.size(f) rescue 0 }
+  puts "\nTotal size: #{total_size / 1024 / 1024}MB"
+
+  print "\nDelete all? [y/N] "
+  if gets.strip.downcase == 'y'
+    files.each { |f| rm(f) }
+    puts "Deleted #{files.count} files."
+  end
+end
+```
+
+### Deploy Script
 
 ```ruby
 #!/usr/bin/env ruby
+require 'rubyshell'
 
-require "rubyshell"
-require "securerandom"
+APP_NAME = "myapp"
+DEPLOY_PATH = "/var/www/#{APP_NAME}"
 
 sh do
-  mkdir "files"
+  puts "Deploying #{APP_NAME}..."
 
-  cd "files" do
-    5.times do |i|
-      chain do
-        echo(SecureRandom.alphanumeric(16)) >> "#{i}.txt"
-      end
-    end
-
-    puts "Number of Files: #{ls.lines.count}"
-
-    ls.each_line do |filename|
-      puts cat(filename)
-    end
+  # Ensure clean state
+  git("status", porcelain: true).lines.tap do |changes|
+    abort "Uncommitted changes!" if changes.any?
   end
-ensure
-  rm "-rf files"
-end
 
-# Running:
-#
-# ❯ ./examples/example1.rb
-#
-# Number of Files: 5
-# o6Kw8KHvWJnLGSeQ
-# qkRKcZHqu2Moq1se
-# nUPluln9GM1ydtoz
-# rkdYsc1RBhkeN1dq
-# ZPXZMqzYfyFfjPHF
+  # Run tests
+  puts "Running tests..."
+  rake("spec")
+
+  # Build and deploy
+  cd DEPLOY_PATH do
+    git("pull", "origin", "main")
+    bundle("install", deployment: true)
+    rake("db:migrate")
+
+    # Restart with zero downtime
+    puts "Restarting..."
+    systemctl("reload", APP_NAME)
+  end
+
+  puts "Deployed successfully!"
+
+rescue RubyShell::CommandError => e
+  puts "Deploy failed: #{e.message}"
+  exit 1
+end
 ```
 
-## Coming
+## Comparison
 
-- Support to Streams
+| Task | Bash | RubyShell |
+|------|------|-----------|
+| Error handling | `cmd \|\| echo "fail"` | `rescue CommandError` |
+| String manipulation | `echo $var \| sed \| awk` | `result.gsub(/.../)` |
+| Data structures | Arrays only | Hashes, objects, classes |
+| Iteration | `for f in *; do` | `.each`, `.map`, `.select` |
+| Testing | DIY | RSpec, Minitest |
+
+## Documentation
+
+See [USAGE.md](USAGE.md) for complete documentation including all options and advanced features.
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```bash
+bin/setup          # Install dependencies
+rake spec          # Run tests
+rake rubocop       # Lint code
+bin/console        # Interactive console
+```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/albertalef/rubyshell. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/albertalef/rubyshell/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on [GitHub](https://github.com/albertalef/rubyshell).
 
 ## Sponsors
 
@@ -206,8 +383,4 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/albert
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the Rubysh project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/albertalef/rubyshell/blob/master/CODE_OF_CONDUCT.md).
+MIT License - see [LICENSE](https://opensource.org/licenses/MIT).
