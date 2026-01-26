@@ -85,8 +85,8 @@ sh do
   find(".", type: "f", mtime: "-7")
     .lines
     .map { |f| [File.size(f.strip), f.strip] }
-    .sort_by { |size, _| -size }
-    .first(10)
+    .sort_by(&:first)
+    .last(10)
     .each { |size, file| puts "#{size / 1024}KB  #{file}" }
 rescue RubyShell::CommandError => e
   puts "Failed: #{e.message}"
