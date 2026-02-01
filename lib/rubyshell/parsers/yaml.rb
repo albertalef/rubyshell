@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require "json"
+require "yaml"
 
 module RubyShell
   module Parsers
-    class Json < Base
+    class Yaml < Base
       def self.parse(value)
-        JSON.parse(value, symbolize_names: true)
+        YAML.safe_load(value, permitted_classes: [Symbol])
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "../../lib/rubyshell/parsers/json"
 
 RSpec.describe RubyShell::Parsers::Json do

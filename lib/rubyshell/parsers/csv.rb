@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
+require "csv"
+
 module RubyShell
   module Parsers
-    class Base
-      def self.parse(_value)
-        raise NotImplementedError
+    class Csv < Base
+      def self.parse(value)
+        CSV.parse(value)
       end
     end
   end

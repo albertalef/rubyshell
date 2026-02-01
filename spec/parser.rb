@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe RubyShell::Parser do
   around(:example) do |example|
     Dir.mktmpdir do |dir|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RubyShell
   class Parser
     class ParserNotFound < StandardError
