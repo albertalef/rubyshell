@@ -18,7 +18,7 @@ module RubyShell
     def exec_command
       result = RubyShell::TerminalExecutor.capture(to_shell, @options)
 
-      result = RubyShell::Parser.parse(@options[:parser], result) if @options[:_parser]
+      result = RubyShell::Parser.parse(@options[:_parse], result) if @options[:_parse]
 
       result
     end

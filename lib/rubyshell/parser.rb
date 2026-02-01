@@ -4,11 +4,15 @@ module RubyShell
     end
 
     def self.parse(parser_key, value)
-      parser_class = "RubyShell::Parsers::#{parser_key.classify}".safe_constantize
-
-      raise ParserNotFound unless parser_class
+      parser_class = locate_parser(parser_key)
 
       parser_class.parse(value)
+    end
+
+    def self.locate_parser(parser_key)
+      Object.const_get("RubyShell::Parsers::#{parser_key.to_s.split("_").map(&:capitalize).join}")
+    rescue NameError
+      raise ParserNotFound
     end
   end
 end
