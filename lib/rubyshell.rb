@@ -10,6 +10,8 @@ require_relative "rubyshell/error"
 require_relative "rubyshell/results/string_result"
 require_relative "rubyshell/terminal_executor"
 require_relative "rubyshell/sanitizer"
+require_relative "rubyshell/parser"
+require_relative "rubyshell/parsers/base"
 
 module Kernel
   def sh(command = nil, *args, &block)

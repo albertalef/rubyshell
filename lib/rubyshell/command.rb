@@ -16,7 +16,11 @@ module RubyShell
     end
 
     def exec_command
-      RubyShell::TerminalExecutor.capture(to_shell, @options)
+      result = RubyShell::TerminalExecutor.capture(to_shell, @options)
+
+      result = RubyShell::Parser.parse(@options[:parser], result) if @options[:_parser]
+
+      result
     end
 
     alias exec exec_command
