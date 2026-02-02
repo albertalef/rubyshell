@@ -14,8 +14,8 @@ module RubyShell
 
           RubyShell.log("Executed: #{command.to_shell.chomp}")
           RubyShell.log("  Duration: #{format("%.6f", time_two - time_one)}s")
-          RubyShell.log("  Pid: #{result._meta[:exit_status].pid}")
-          RubyShell.log("  Exit code: #{result._meta[:exit_status].to_i}")
+          RubyShell.log("  Pid: #{result.metadata[:exit_status].pid}")
+          RubyShell.log("  Exit code: #{result.metadata[:exit_status].to_i}")
           RubyShell.log("  Stdout: #{result.to_s.inspect}")
 
           result

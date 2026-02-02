@@ -64,7 +64,7 @@ module RubyShell
           )
         end
 
-        RubyShell::Results::StringResult.new(output.chomp, _meta: {
+        RubyShell::Results::StringResult.new(output.chomp, metadata: {
                                                command: command,
                                                exit_status: status
                                              })

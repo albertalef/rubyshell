@@ -4,12 +4,12 @@ module RubyShell
   module Results
     class StringResult < String
       def initialize(value, **kwargs)
-        @_meta = kwargs.delete(:_meta)
+        @metadata = kwargs.delete(:metadata)
 
-        super(value)
+        super
       end
 
-      attr_reader :_meta
+      attr_reader :metadata
 
       def inspect
         if $stdin.isatty
