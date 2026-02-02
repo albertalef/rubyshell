@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "../lib/rubyshell"
 require "tmpdir"
 require "debug"
+require_relative "../lib/rubyshell"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

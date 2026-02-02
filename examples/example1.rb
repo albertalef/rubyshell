@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "rubyshell"
+require_relative "../lib/rubyshell"
 require "securerandom"
 
-sh do
-  mkdir "files"
+sh(debug: true) do
+  mkdir "-p", "files"
 
   cd "files" do
     5.times do |i|

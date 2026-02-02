@@ -10,8 +10,8 @@ module RubyShell
       RubyShell::ChainContext.class_eval(&block).exec_commands
     end
 
-    def method_missing(method_name, *args)
-      command = RubyShell::Command.new(method_name.to_s.gsub(/!$/, ""), *args)
+    def method_missing(method_name, *args, **kwargs)
+      command = RubyShell::Command.new(method_name.to_s.gsub(/!$/, ""), *args, **kwargs)
 
       if method_name.to_s.match?(/!$/)
         command
