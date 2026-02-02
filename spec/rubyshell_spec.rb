@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "tmpdir"
-require "debug"
-
 RSpec.describe RubyShell do # rubocop:disable Metrics/BlockLength
   around(:example) do |example|
     Dir.mktmpdir do |dir|
