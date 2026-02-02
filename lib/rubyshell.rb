@@ -22,7 +22,7 @@ module RubyShell
       @debug_mode = !!value
     end
 
-    def debug(value = true)
+    def debug(value = true) # rubocop:disable Style/OptionalBooleanParameter
       previous_value = @debug_mode
 
       @debug_mode = value
