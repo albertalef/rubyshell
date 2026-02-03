@@ -1,3 +1,3 @@
-[submodule "rubyshell.wiki"]
-	path = rubyshell.wiki
+[submodule "wiki"]
+	path = wiki
 	url = https://github.com/albertalef/rubyshell.wiki.git
