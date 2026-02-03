@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../lib/rubyshell/parsers/json"
+
 RSpec.describe RubyShell::Parser do
   around(:example) do |example|
     Dir.mktmpdir do |dir|
@@ -11,8 +13,6 @@ RSpec.describe RubyShell::Parser do
     describe "#parse" do
       context "when parser file exists" do
         def subject_method
-          require_relative "../lib/rubyshell/parsers/json"
-
           sh.echo("{\"Ruby\": \"Shell\"}", _parse: :json)
         end
 
@@ -27,6 +27,8 @@ RSpec.describe RubyShell::Parser do
         def subject_method
           sh.echo("{\"Ruby\": \"Shell\"}", _parse: :json)
         end
+
+        before { hide_const("RubyShell::Parsers::Json") }
 
         it "raises an error" do
           expect { subject_method }.to raise_error(RubyShell::Parser::ParserNotFound)
