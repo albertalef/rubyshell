@@ -13,7 +13,9 @@ module RubyShell
                       options[:_stdin]
                     end
 
-      Open3.popen3(command) do |stdin, stdout, stderr, w_thread|
+      env_hash = RubyShell.env.to_h.merge(options[:_env]&.transform_keys(&:to_s) || {})
+
+      Open3.popen3(env_hash, command) do |stdin, stdout, stderr, w_thread|
         stdin.write(stdin_value) if stdin_value
 
         stdin.close

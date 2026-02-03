@@ -15,6 +15,7 @@ require_relative "rubyshell/sanitizer"
 require_relative "rubyshell/parser"
 require_relative "rubyshell/parsers/base"
 require_relative "rubyshell/debugger"
+require_relative "rubyshell/env_proxy"
 
 module RubyShell
   class << self
@@ -51,6 +52,14 @@ module RubyShell
     def log(text)
       logger.send(@log_level || :info, text)
     end
+
+    def env
+      RubyShell::EnvProxy
+    end
+
+    def config(kwargs)
+      env.set(kwargs[:_env]) if kwargs[:_env]
+    end
   end
 end
 
@@ -61,6 +70,8 @@ module Kernel
     elsif block.nil?
       RubyShell::Executor
     else
+      RubyShell.config(kwargs)
+
       RubyShell.debug(kwargs[:debug]) do
         RubyShell::Executor.class_eval(&block)
       end
