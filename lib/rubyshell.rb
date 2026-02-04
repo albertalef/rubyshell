@@ -16,6 +16,7 @@ require_relative "rubyshell/parser"
 require_relative "rubyshell/parsers/base"
 require_relative "rubyshell/debugger"
 require_relative "rubyshell/env_proxy"
+require_relative "rubyshell/parallel_executor"
 
 module RubyShell
   class << self
@@ -58,7 +59,7 @@ module RubyShell
     end
 
     def config(kwargs)
-      env.set(kwargs[:_env]) if kwargs[:_env]
+      env.set(kwargs[:env]) if kwargs[:env]
     end
   end
 end
@@ -82,5 +83,11 @@ end
 class String
   def quoted
     "\"#{self}\""
+  end
+end
+
+class Object
+  def try(*args, &block)
+    send(*args, &block) if args.empty? || respond_to?(args.first)
   end
 end

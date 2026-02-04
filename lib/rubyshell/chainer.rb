@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
+require "debug"
 module RubyShell
   class Chainer
-    attr_reader :parts
+    attr_reader :parts, :options
 
     def initialize(command, options = {})
       @parts = [command]
@@ -32,7 +33,13 @@ module RubyShell
     end
 
     def exec_commands
-      RubyShell::TerminalExecutor.capture(to_shell, @options)
+      result = RubyShell::Debugger.run_wrapper(self, debug: @options[:_debug]) do
+        RubyShell::TerminalExecutor.capture(to_shell, @options)
+      end
+
+      result = RubyShell::Parser.parse(@options[:_parse], result) if @options[:_parse]
+
+      result
     end
 
     alias exec exec_commands

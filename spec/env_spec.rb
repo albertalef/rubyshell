@@ -50,8 +50,8 @@ RSpec.describe RubyShell do
   end
 
   describe "RubyShell.config" do
-    context "when setting _env via config" do
-      before { RubyShell.config(_env: { "CONFIG_VAR" => "config_value" }) }
+    context "when setting env via config" do
+      before { RubyShell.config(env: { "CONFIG_VAR" => "config_value" }) }
 
       it "sets global environment variables" do
         expect(sh.printenv("CONFIG_VAR")).to eq("config_value")
@@ -59,10 +59,10 @@ RSpec.describe RubyShell do
     end
   end
 
-  describe "sh block with _env" do
-    context "when passing _env to sh block" do
+  describe "sh block with env" do
+    context "when passing env to sh block" do
       def subject_call
-        sh(_env: { "BLOCK_LEVEL" => "block_value" }) do
+        sh(env: { "BLOCK_LEVEL" => "block_value" }) do
           printenv("BLOCK_LEVEL")
         end
       end

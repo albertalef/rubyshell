@@ -2,15 +2,22 @@
 
 module RubyShell
   class ChainContext
-    def self.sh(command, *args)
+    def initialize(options = {})
+      @options = options
+    end
+
+    def sh(command, *args)
       method_missing(command, *args)
     end
 
-    def self.method_missing(method_name, *args, &block)
-      RubyShell::Chainer.new(RubyShell::Command.new(method_name, *(args << { _manual: true }), &block))
+    def method_missing(method_name, *args, &block)
+      RubyShell::Chainer.new(
+        RubyShell::Command.new(method_name, *(args << { _manual: true }), &block),
+        @options
+      )
     end
 
-    def self.respond_to_missing?(_name, _include_private)
+    def respond_to_missing?(_name, _include_private)
       false
     end
   end
