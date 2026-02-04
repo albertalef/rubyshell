@@ -50,7 +50,10 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - **Executable generator** ([#29](https://github.com/albertalef/rubyshell/pull/29))
-  - `rubyshell new <file>` command to create executable scripts with `chmod +x`
+  ```bash
+  $ rubyshell new myscript
+  # Creates executable file with chmod +x
+  ```
 
 - **Stdin parameter support**
   - `_stdin` option to pass string or command output to stdin
