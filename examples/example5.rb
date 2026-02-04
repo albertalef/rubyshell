@@ -14,7 +14,7 @@ sh(debug: true) do
   puts "Before Print"
 
   results.each do |a|
-    puts a
+    puts "Result: #{a}"
   end
 
   puts "After Print"

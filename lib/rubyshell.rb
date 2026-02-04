@@ -85,9 +85,3 @@ class String
     "\"#{self}\""
   end
 end
-
-class Object
-  def try(*args, &block)
-    send(*args, &block) if args.empty? || respond_to?(args.first)
-  end
-end
