@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
+require "debug"
 module RubyShell
   class Chainer
-    attr_reader :parts
+    attr_reader :parts, :options
 
     def initialize(command, options = {})
       @parts = [command]
@@ -19,6 +20,14 @@ module RubyShell
       self
     end
 
+    def shared_settings
+      %i[env debug]
+    end
+
+    def settings
+      @options.select { shared_settings.include?(_1.to_sym) }.transform_keys { :"_#{_1}" }
+    end
+
     def method_missing(method_name, *args, &block)
       if method_name.start_with?(/[^A-Za-z0-9]/)
         handle_chain(method_name, args.first)
@@ -32,7 +41,13 @@ module RubyShell
     end
 
     def exec_commands
-      RubyShell::TerminalExecutor.capture(to_shell, @options)
+      result = RubyShell::Debugger.run_wrapper(self, debug: @options[:debug]) do
+        RubyShell::TerminalExecutor.capture(to_shell, settings)
+      end
+
+      result = RubyShell::Parser.parse(@options[:parse], result) if @options[:parse]
+
+      result
     end
 
     alias exec exec_commands
