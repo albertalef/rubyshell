@@ -6,19 +6,44 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Parallel Execution** ([#34](https://github.com/albertalef/rubyshell/pull/34))
+  ```ruby
+  sh do
+    results = parallel do
+      curl("https://api1.example.com")
+      curl("https://api2.example.com")
+      chain { ls | wc("-l") }
+    end
+
+    results.each { |r| puts r }
+  end
+  ```
+  - Returns an Enumerator with results in completion order
+  - Supports regular commands, chains, and `sh()` calls
+  - Errors are captured and returned as values (not raised)
+
+- **Chain Options** ([#34](https://github.com/albertalef/rubyshell/pull/34))
+  ```ruby
+  # Debug mode for chains
+  chain(debug: true) { ls | grep("test") }
+
+  # Parse chain output
+  chain(parse: :json) { curl("https://api.example.com") }
+  ```
+
 - **Environment Variables** ([#47](https://github.com/albertalef/rubyshell/pull/47))
   ```ruby
   # Command-level
   sh.npm("start", _env: { NODE_ENV: "production" })
 
   # Block-level
-  sh(_env: { DATABASE_URL: "postgres://localhost/db" }) do
+  sh(env: { DATABASE_URL: "postgres://localhost/db" }) do
     rake("db:migrate")
   end
 
   # Global
   RubyShell.env[:API_KEY] = "secret"
-  RubyShell.config(_env: { DEBUG: "true" })
+  RubyShell.config(env: { DEBUG: "true" })
   ```
 
 - **Debug Mode** ([#39](https://github.com/albertalef/rubyshell/pull/39))
@@ -41,6 +66,18 @@ All notable changes to this project will be documented in this file.
   ```
 
 ### Changed
+
+- **BREAKING:** Renamed `_env` to `env` in `RubyShell.config` and `sh` block options ([#34](https://github.com/albertalef/rubyshell/pull/34))
+  ```ruby
+  # Before
+  RubyShell.config(_env: { DEBUG: "true" })
+  sh(_env: { NODE_ENV: "production" }) { ... }
+
+  # After
+  RubyShell.config(env: { DEBUG: "true" })
+  sh(env: { NODE_ENV: "production" }) { ... }
+  ```
+  Note: Command-level `_env` option remains unchanged.
 
 - Refactored specs directory structure
 
