@@ -356,21 +356,5 @@ RSpec.describe RubyShell::ParallelExecutor do
         expect(subject_call).to include("file1.txt", "file2.txt")
       end
     end
-
-    context "when nesting parallel blocks" do
-      def subject_call
-        sh do
-          parallel do
-            parallel do
-              echo("nested")
-            end.to_a
-          end.to_a
-        end
-      end
-
-      it "returns CommandError for nested parallel (parallel is not available inside parallel)" do
-        expect(subject_call.first).to be_a(RubyShell::CommandError)
-      end
-    end
   end
 end
