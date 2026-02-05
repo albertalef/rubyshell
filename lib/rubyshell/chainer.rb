@@ -20,8 +20,12 @@ module RubyShell
       self
     end
 
+    def shared_settings
+      %i[env debug]
+    end
+
     def settings
-      @options.select { _1.to_s.start_with?("_") }
+      @options.select { shared_settings.include?(_1.to_sym) }.transform_keys { :"_#{_1}" }
     end
 
     def method_missing(method_name, *args, &block)

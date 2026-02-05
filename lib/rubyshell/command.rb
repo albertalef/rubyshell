@@ -15,13 +15,9 @@ module RubyShell
       [@command_name.to_s.gsub("!", ""), *parsed_args].join(" ")
     end
 
-    def settings
-      @options.select { _1.to_s.start_with?("_") }
-    end
-
     def exec_command
       result = RubyShell::Debugger.run_wrapper(self, debug: @options[:_debug]) do
-        RubyShell::TerminalExecutor.capture(to_shell, settings)
+        RubyShell::TerminalExecutor.capture(to_shell, @options)
       end
 
       result = RubyShell::Parser.parse(@options[:_parse], result) if @options[:_parse]
