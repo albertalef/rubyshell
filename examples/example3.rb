@@ -2,12 +2,12 @@
 # frozen_string_literal: true
 
 require "rubyshell"
-require "json"
+require "rubyshell/parsers/json"
 
 sh do
-  response = curl("-s", "https://official-joke-api.appspot.com/random_ten")
+  response = curl("-s", "https://official-joke-api.appspot.com/random_ten", _parse: :json)
 
-  JSON.parse(response).each.with_index do |data, i|
+  response.each.with_index do |data, i|
     puts " Joke: #{i.next} ".center(30, "-")
     puts "Setup: #{data["setup"]}"
     puts "Punchline: #{data["punchline"]}"

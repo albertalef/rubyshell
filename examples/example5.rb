@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative "../lib/rubyshell"
+require "rubyshell"
 
 sh(debug: true) do
   results = parallel do
