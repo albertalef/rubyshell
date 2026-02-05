@@ -151,6 +151,79 @@ sh do
 end
 ```
 
+### Parallel Execution
+
+Run multiple commands concurrently and get results as they complete:
+
+```ruby
+sh do
+  results = parallel do
+    curl("https://api1.example.com")
+    curl("https://api2.example.com")
+    chain { ls | wc("-l") }
+  end
+
+  results.each { |r| puts r }
+end
+```
+
+Returns an Enumerator with results in completion order. Errors are captured and returned as values (not raised).
+
+### Environment Variables
+
+```ruby
+# Command-level
+sh.npm("start", _env: { NODE_ENV: "production" })
+
+# Block-level
+sh(env: { DATABASE_URL: "postgres://localhost/db" }) do
+  rake("db:migrate")
+end
+
+# Global
+RubyShell.env[:API_KEY] = "secret"
+RubyShell.config(env: { DEBUG: "true" })
+```
+
+### Debug Mode
+
+```ruby
+# Global
+RubyShell.debug = true
+
+# Block scope
+RubyShell.debug { sh.ls }
+
+# Per command
+sh.git("status", _debug: true)
+# Output:
+#   Executed: git status
+#   Duration: 0.003521s
+#   Pid: 12345
+#   Exit code: 0
+#   Stdout: "On branch main..."
+```
+
+### Output Parsers
+
+Parse command output directly into Ruby objects:
+
+```ruby
+sh.cat("data.json", _parse: :json)   # => Hash
+sh.cat("config.yml", _parse: :yaml)  # => Hash
+sh.cat("users.csv", _parse: :csv)    # => Array
+```
+
+### Chain Options
+
+```ruby
+# Debug mode for chains
+chain(debug: true) { ls | grep("test") }
+
+# Parse chain output
+chain(parse: :json) { curl("https://api.example.com") }
+```
+
 ## Real-World Examples
 
 ### Git Workflow Automation
