@@ -9,6 +9,10 @@ module RubyShell
       @queue = Queue.new
     end
 
+    def settings
+      @options.select { _1.to_s.start_with?("_") }
+    end
+
     def _evaluate(&block)
       instance_exec(&block)
 
@@ -32,7 +36,7 @@ module RubyShell
     end
 
     def chain(options = {}, &block)
-      @commands << RubyShell::ChainContext.new(options).instance_eval(&block)
+      @commands << RubyShell::ChainContext.new(settings.merge(options)).instance_exec(&block)
     end
 
     def sh(command, *args)
@@ -40,7 +44,7 @@ module RubyShell
     end
 
     def method_missing(method_name, *args, **kwargs)
-      command = RubyShell::Command.new(method_name.to_s.gsub(/!$/, ""), *args, **kwargs)
+      command = RubyShell::Command.new(method_name.to_s.gsub(/!$/, ""), *args, **settings, **kwargs)
 
       @commands << command
     end

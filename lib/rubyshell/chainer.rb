@@ -20,6 +20,10 @@ module RubyShell
       self
     end
 
+    def settings
+      @options.select { _1.to_s.start_with?("_") }
+    end
+
     def method_missing(method_name, *args, &block)
       if method_name.start_with?(/[^A-Za-z0-9]/)
         handle_chain(method_name, args.first)
@@ -34,7 +38,7 @@ module RubyShell
 
     def exec_commands
       result = RubyShell::Debugger.run_wrapper(self, debug: @options[:_debug]) do
-        RubyShell::TerminalExecutor.capture(to_shell, @options)
+        RubyShell::TerminalExecutor.capture(to_shell, settings)
       end
 
       result = RubyShell::Parser.parse(@options[:_parse], result) if @options[:_parse]
