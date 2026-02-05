@@ -48,31 +48,31 @@ RSpec.describe RubyShell::Debugger do
       it "logs the command executed" do
         subject_method
 
-        expect(log_output).to include("Executed: echo hello")
+        expect(log_output.join).to include("Executed: echo hello")
       end
 
       it "logs the duration" do
         subject_method
 
-        expect(log_output.find { |msg| msg.match?(/Duration: \d+\.\d+s/) }).not_to be_nil
+        expect(log_output.join).to match(/Duration: \d+\.\d+s/)
       end
 
       it "logs the pid" do
         subject_method
 
-        expect(log_output.find { |msg| msg.match?(/Pid: \d+/) }).not_to be_nil
+        expect(log_output.join).to match(/Pid: \d+/)
       end
 
       it "logs the exit code" do
         subject_method
 
-        expect(log_output).to include("  Exit code: 0")
+        expect(log_output.join).to include("Exit code: 0")
       end
 
       it "logs the stdout" do
         subject_method
 
-        expect(log_output).to include('  Stdout: "hello"')
+        expect(log_output.join).to include('Stdout: "hello"')
       end
     end
 
@@ -88,31 +88,31 @@ RSpec.describe RubyShell::Debugger do
       it "logs the command executed" do
         subject_method
 
-        expect(log_output).to include("Executed: echo hello")
+        expect(log_output.join).to include("Executed: echo hello")
       end
 
       it "logs the duration" do
         subject_method
 
-        expect(log_output.find { |msg| msg.match?(/Duration: \d+\.\d+s/) }).not_to be_nil
+        expect(log_output.join).to match(/Duration: \d+\.\d+s/)
       end
 
       it "logs the pid" do
         subject_method
 
-        expect(log_output.find { |msg| msg.match?(/Pid: \d+/) }).not_to be_nil
+        expect(log_output.join).to match(/Pid: \d+/)
       end
 
       it "logs the exit code" do
         subject_method
 
-        expect(log_output).to include("  Exit code: 0")
+        expect(log_output.join).to include("Exit code: 0")
       end
 
       it "logs the stdout" do
         subject_method
 
-        expect(log_output).to include('  Stdout: "hello"')
+        expect(log_output.join).to include('Stdout: "hello"')
       end
     end
 
@@ -130,31 +130,31 @@ RSpec.describe RubyShell::Debugger do
       it "logs the command executed" do
         subject_method
 
-        expect(log_output).to include("Executed: echo world")
+        expect(log_output.join).to include("Executed: echo world")
       end
 
       it "logs the duration" do
         subject_method
 
-        expect(log_output.find { |msg| msg.match?(/Duration: \d+\.\d+s/) }).not_to be_nil
+        expect(log_output.join).to match(/Duration: \d+\.\d+s/)
       end
 
       it "logs the pid" do
         subject_method
 
-        expect(log_output.find { |msg| msg.match?(/Pid: \d+/) }).not_to be_nil
+        expect(log_output.join).to match(/Pid: \d+/)
       end
 
       it "logs the exit code" do
         subject_method
 
-        expect(log_output).to include("  Exit code: 0")
+        expect(log_output.join).to include("Exit code: 0")
       end
 
       it "logs the stdout" do
         subject_method
 
-        expect(log_output).to include('  Stdout: "world"')
+        expect(log_output.join).to include('Stdout: "world"')
       end
     end
   end

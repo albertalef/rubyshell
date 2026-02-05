@@ -22,6 +22,8 @@ Style/SpecialGlobalVars:
 
 Metrics/BlockLength:
   Max: 200
+  Exclude:
+    - "spec/**/*"
 
 Lint/ConstantDefinitionInBlock:
   Exclude:
