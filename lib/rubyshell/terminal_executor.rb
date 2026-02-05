@@ -66,10 +66,13 @@ module RubyShell
           )
         end
 
-        RubyShell::Results::StringResult.new(output.chomp, metadata: {
-                                               command: command,
-                                               exit_status: status
-                                             })
+        RubyShell::Results::StringResult.new(
+          output.chomp,
+          metadata: {
+            command: command,
+            exit_status: status
+          }
+        )
       end
     rescue StandardError => e
       raise e if e.is_a?(RubyShell::CommandError)
