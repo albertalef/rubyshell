@@ -41,11 +41,11 @@ module RubyShell
     end
 
     def exec_commands
-      result = RubyShell::Debugger.run_wrapper(self, debug: @options[:_debug]) do
+      result = RubyShell::Debugger.run_wrapper(self, debug: @options[:debug]) do
         RubyShell::TerminalExecutor.capture(to_shell, settings)
       end
 
-      result = RubyShell::Parser.parse(@options[:_parse], result) if @options[:_parse]
+      result = RubyShell::Parser.parse(@options[:parse], result) if @options[:parse]
 
       result
     end
