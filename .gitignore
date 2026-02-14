@@ -14,3 +14,4 @@
 .irbrc
 
 rubyshell-*.gem
+sshd-config/

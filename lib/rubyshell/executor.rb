@@ -16,6 +16,10 @@ module RubyShell
       end
     end
 
+    def remote(host, **options, &block)
+      RubyShell::RemoteExecutor.new(host, **options).evaluate(&block)
+    end
+
     def method_missing(method_name, *args, **kwargs)
       command = RubyShell::Command.new(method_name.to_s.gsub(/!$/, ""), *args, **kwargs)
 

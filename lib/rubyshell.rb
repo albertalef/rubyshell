@@ -17,6 +17,7 @@ require_relative "rubyshell/parsers/base"
 require_relative "rubyshell/debugger"
 require_relative "rubyshell/env_proxy"
 require_relative "rubyshell/parallel_executor"
+require_relative "rubyshell/remote_executor"
 
 module RubyShell
   class << self
