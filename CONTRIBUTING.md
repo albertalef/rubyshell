@@ -162,4 +162,4 @@ end
 - Ruby 2.6+ target
 - Follow RuboCop defaults — run `rubocop -a` to auto-fix
 - 2-space indentation, double-quoted strings, 120 char line length
-- Commit messages use `type: summary` format (e.g., `fix: update version`, `refactor: extract method`)
+- (Optional) Commit messages use `type: summary` format (e.g., `fix: update version`, `refactor: extract method`)
