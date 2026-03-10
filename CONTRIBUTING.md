@@ -43,7 +43,7 @@ end
 
 ### Wrap Tests in `context` Blocks
 
-All tests must be inside `context` blocks — no file-level `it` blocks. Context descriptions should start with "when":
+All tests must be inside `context` blocks, no file-level `it` blocks. Context descriptions should start with "when":
 
 ```ruby
 context "when executing a single command" do
@@ -141,6 +141,45 @@ it "has the right message" do
 end
 ```
 
+### Avoid `shared_examples`
+
+Prefer precise, context-specific tests over `shared_examples`. Each context has its own nuances, write tests that capture those differences instead of reusing generic shared blocks that check the same thing across multiple contexts.
+
+```ruby
+# Good - each context tests its specific behavior
+context "when debug mode is enabled via block" do
+  def subject_method
+    sh(debug: true) { echo("hello") }
+  end
+
+  it "logs the command executed" do
+    subject_method
+    expect(log_output.join).to include("Executed: echo hello")
+  end
+end
+
+context "when debug mode is enabled globally" do
+  before { RubyShell.debug = true }
+
+  def subject_method
+    sh.echo("world")
+  end
+
+  it "logs the command executed" do
+    subject_method
+    expect(log_output.join).to include("Executed: echo world")
+  end
+end
+
+# Bad - shared examples hide nuances
+shared_examples "debug logging" do
+  it "logs the command executed" do
+    subject_method
+    expect(log_output.join).to include("Executed:")
+  end
+end
+```
+
 ### `describe` Nesting
 
 Use top-level `describe` for the class/module, nested `describe` for features or method groups, and `context` for scenarios:
@@ -160,6 +199,6 @@ end
 ## Code Style
 
 - Ruby 2.6+ target
-- Follow RuboCop defaults — run `rubocop -a` to auto-fix
+- Follow RuboCop defaults, run `rubocop -a` to auto-fix
 - 2-space indentation, double-quoted strings, 120 char line length
 - (Optional) Commit messages use `type: summary` format (e.g., `fix: update version`, `refactor: extract method`)
