@@ -12,15 +12,34 @@ RSpec.describe RubyShell::Debugger do
       expect(subject_method).to eq(expected_output)
     end
 
-    it "logs all debug information" do
+    it "logs the command executed" do
       subject_method
-      log = log_output.join
 
-      expect(log).to include("Executed: echo #{expected_output}")
-      expect(log).to match(/Duration: \d+\.\d+s/)
-      expect(log).to match(/Pid: \d+/)
-      expect(log).to include("Exit code: 0")
-      expect(log).to include("Stdout: \"#{expected_output}\"")
+      expect(log_output.join).to include("Executed: echo #{expected_output}")
+    end
+
+    it "logs the duration" do
+      subject_method
+
+      expect(log_output.join).to match(/Duration: \d+\.\d+s/)
+    end
+
+    it "logs the pid" do
+      subject_method
+
+      expect(log_output.join).to match(/Pid: \d+/)
+    end
+
+    it "logs the exit code" do
+      subject_method
+
+      expect(log_output.join).to include("Exit code: 0")
+    end
+
+    it "logs the stdout" do
+      subject_method
+
+      expect(log_output.join).to include("Stdout: \"#{expected_output}\"")
     end
   end
 
