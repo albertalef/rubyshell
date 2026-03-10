@@ -11,7 +11,22 @@ rake rubocop       # Lint code
 rake               # Run both spec and rubocop
 ```
 
-## Testing Patterns
+## Code Style
+
+- Ruby 2.6+ target
+- Follow RuboCop defaults, run `rubocop -a` to auto-fix
+- 2-space indentation, double-quoted strings, 120 char line length
+
+## Comments
+
+- Avoid comments in the code
+- Only add them when necessary to explain non-obvious logic to other developers or reviewers
+
+## Commits
+
+- (Optional) Commit messages use `type: summary` format (e.g., `fix: update version`, `refactor: extract method`)
+
+## Testing
 
 We follow specific RSpec conventions across the project. Please follow these when writing tests.
 
@@ -156,10 +171,3 @@ RSpec.describe RubyShell::Parsers::Json do
   end
 end
 ```
-
-## Code Style
-
-- Ruby 2.6+ target
-- Follow RuboCop defaults, run `rubocop -a` to auto-fix
-- 2-space indentation, double-quoted strings, 120 char line length
-- (Optional) Commit messages use `type: summary` format (e.g., `fix: update version`, `refactor: extract method`)
