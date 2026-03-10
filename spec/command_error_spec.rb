@@ -10,8 +10,11 @@ RSpec.describe RubyShell::CommandError do
   end
 
   describe "Error object API" do
-    it "stores the command, stderr, and status" do
+    it "stores the command" do
       expect(error_instance.command).to eq("false")
+    end
+
+    it "stores the status" do
       expect(error_instance.status.to_s).to match(/exit 1/)
     end
   end

@@ -3,7 +3,7 @@
 require_relative "../lib/rubyshell/parsers/json"
 
 RSpec.describe RubyShell::Parser do
-  around(:example) do |example|
+  around do |example|
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) { example.run }
     end

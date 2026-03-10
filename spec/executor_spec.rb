@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 RSpec.describe RubyShell do
-  around(:example) do |example|
+  around do |example|
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) { example.run }
     end
   end
 
   describe "Validating Executor Module" do
-    context "whe using sh method to execute a command as param" do
+    context "when using sh method to execute a command as param" do
       def subject_call
         sh("mkdir", "example-folder")
         sh("cd", "example-folder")
@@ -26,7 +26,7 @@ RSpec.describe RubyShell do
       end
     end
 
-    context "whe using sh method to execute a command as param inside another sh block" do
+    context "when using sh method to execute a command as param inside another sh block" do
       def subject_call
         sh do
           sh("mkdir", "example-folder")

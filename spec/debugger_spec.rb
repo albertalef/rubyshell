@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe RubyShell::Debugger do
-  around(:example) do |example|
+  around do |example|
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) { example.run }
     end

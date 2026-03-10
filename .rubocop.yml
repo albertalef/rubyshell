@@ -1,3 +1,6 @@
+require:
+  - rubocop-rspec
+
 AllCops:
   NewCops: enable
   TargetRubyVersion: 2.6
@@ -34,3 +37,18 @@ Metrics/AbcSize:
 
 Metrics/MethodLength:
   Max: 30
+
+RSpec/SpecFilePathFormat:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 5
+
+RSpec/DescribedClass:
+  Enabled: false
+
+RSpec/VerifiedDoubles:
+  Enabled: false
+
+RSpec/IndexedLet:
+  Enabled: false

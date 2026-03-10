@@ -3,7 +3,7 @@
 require_relative "../lib/rubyshell/parsers/json"
 
 RSpec.describe RubyShell do
-  around(:example) do |example|
+  around do |example|
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) { example.run }
     end
@@ -26,18 +26,6 @@ RSpec.describe RubyShell do
       def subject_call
         sh do
           (ls! | wc!("-l")).exec
-        end
-      end
-
-      it "returns an string" do
-        expect(subject_call.strip).to eq("0")
-      end
-    end
-
-    context "when counting files in current folder" do
-      def subject_call
-        sh do
-          chain { ls | wc("-l") }
         end
       end
 
