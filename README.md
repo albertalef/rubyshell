@@ -446,7 +446,7 @@ bin/console        # Interactive console
 
 ## Contributing
 
-Bug reports and pull requests are welcome on [GitHub](https://github.com/albertalef/rubyshell).
+Bug reports and pull requests are welcome on [GitHub](https://github.com/albertalef/rubyshell). See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and testing patterns.
 
 ## Sponsors
 
