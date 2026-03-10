@@ -7,6 +7,53 @@ RSpec.describe RubyShell::Debugger do
     end
   end
 
+  RSpec.shared_examples "a logged command" do |expected_output|
+    it "returns the command output" do
+      expect(subject_method).to eq(expected_output)
+    end
+
+    it "logs the command executed" do
+      subject_method
+
+      expect(log_output.join).to include("Executed: echo #{expected_output}")
+    end
+
+    it "logs the duration" do
+      subject_method
+
+      expect(log_output.join).to match(/Duration: \d+\.\d+s/)
+    end
+
+    it "logs the pid" do
+      subject_method
+
+      expect(log_output.join).to match(/Pid: \d+/)
+    end
+
+    it "logs the exit code" do
+      subject_method
+
+      expect(log_output.join).to include("Exit code: 0")
+    end
+
+    it "logs the stdout" do
+      subject_method
+
+      expect(log_output.join).to include("Stdout: \"#{expected_output}\"")
+    end
+  end
+
+  RSpec.shared_examples "a silent command" do
+    it "returns the command output" do
+      expect(subject_method).to eq("hello")
+    end
+
+    it "does not log anything" do
+      subject_method
+      expect(log_output).to be_empty
+    end
+  end
+
   describe ".run_wrapper" do
     let(:log_output) { [] }
     let(:logger) { double("Logger", info: nil) }
@@ -16,145 +63,44 @@ RSpec.describe RubyShell::Debugger do
       allow(RubyShell).to receive(:logger).and_return(logger)
     end
 
-    after do
-      RubyShell.debug = false
-    end
+    after { RubyShell.debug = false }
 
     context "when debug mode is disabled" do
       def subject_method
         sh.echo("hello")
       end
-
-      it "returns the command output" do
-        expect(subject_method).to eq("hello")
-      end
-
-      it "does not log anything" do
-        subject_method
-
-        expect(log_output).to be_empty
-      end
+      it_behaves_like "a silent command"
     end
 
     context "when debug mode is enabled via block" do
       def subject_method
         sh(debug: true) { echo("hello") }
       end
-
-      it "returns the command output" do
-        expect(subject_method).to eq("hello")
-      end
-
-      it "logs the command executed" do
-        subject_method
-
-        expect(log_output.join).to include("Executed: echo hello")
-      end
-
-      it "logs the duration" do
-        subject_method
-
-        expect(log_output.join).to match(/Duration: \d+\.\d+s/)
-      end
-
-      it "logs the pid" do
-        subject_method
-
-        expect(log_output.join).to match(/Pid: \d+/)
-      end
-
-      it "logs the exit code" do
-        subject_method
-
-        expect(log_output.join).to include("Exit code: 0")
-      end
-
-      it "logs the stdout" do
-        subject_method
-
-        expect(log_output.join).to include('Stdout: "hello"')
-      end
+      it_behaves_like "a logged command", "hello"
     end
 
     context "when debug mode is enabled via command option" do
       def subject_method
         sh.echo("hello", _debug: true)
       end
-
-      it "returns the command output" do
-        expect(subject_method).to eq("hello")
-      end
-
-      it "logs the command executed" do
-        subject_method
-
-        expect(log_output.join).to include("Executed: echo hello")
-      end
-
-      it "logs the duration" do
-        subject_method
-
-        expect(log_output.join).to match(/Duration: \d+\.\d+s/)
-      end
-
-      it "logs the pid" do
-        subject_method
-
-        expect(log_output.join).to match(/Pid: \d+/)
-      end
-
-      it "logs the exit code" do
-        subject_method
-
-        expect(log_output.join).to include("Exit code: 0")
-      end
-
-      it "logs the stdout" do
-        subject_method
-
-        expect(log_output.join).to include('Stdout: "hello"')
-      end
+      it_behaves_like "a logged command", "hello"
     end
 
     context "when debug mode is enabled globally" do
       before { RubyShell.debug = true }
 
-      def subject_method
-        sh.echo("world")
+      context "when command is used as a method" do
+        def subject_method
+          sh.echo("world")
+        end
+        it_behaves_like "a logged command", "world"
       end
 
-      it "returns the command output" do
-        expect(subject_method).to eq("world")
-      end
-
-      it "logs the command executed" do
-        subject_method
-
-        expect(log_output.join).to include("Executed: echo world")
-      end
-
-      it "logs the duration" do
-        subject_method
-
-        expect(log_output.join).to match(/Duration: \d+\.\d+s/)
-      end
-
-      it "logs the pid" do
-        subject_method
-
-        expect(log_output.join).to match(/Pid: \d+/)
-      end
-
-      it "logs the exit code" do
-        subject_method
-
-        expect(log_output.join).to include("Exit code: 0")
-      end
-
-      it "logs the stdout" do
-        subject_method
-
-        expect(log_output.join).to include('Stdout: "world"')
+      context "when command is executed in a block" do
+        def subject_method
+          sh { echo("world") }
+        end
+        it_behaves_like "a logged command", "world"
       end
     end
   end

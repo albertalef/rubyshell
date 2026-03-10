@@ -27,7 +27,7 @@ module RubyShell
     def debug(value = true) # rubocop:disable Style/OptionalBooleanParameter
       previous_value = @debug_mode
 
-      @debug_mode = value
+      @debug_mode = value.nil? ? @debug_mode : value
 
       result = yield
 
