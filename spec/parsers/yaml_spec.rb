@@ -3,7 +3,7 @@
 require_relative "../../lib/rubyshell/parsers/yaml"
 
 RSpec.describe RubyShell::Parsers::Yaml do
-  around(:example) do |example|
+  around do |example|
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) { example.run }
     end

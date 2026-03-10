@@ -11,7 +11,22 @@ rake rubocop       # Lint code
 rake               # Run both spec and rubocop
 ```
 
-## Testing Patterns
+## Code Style
+
+- Ruby 2.6+ target
+- Follow RuboCop defaults, run `rubocop -a` to auto-fix
+- 2-space indentation, double-quoted strings, 120 char line length
+
+## Comments
+
+- Avoid comments in the code
+- Only add them when necessary to explain non-obvious logic to other developers or reviewers
+
+## Commits
+
+- (Optional) Commit messages use `type: summary` format (e.g., `fix: update version`, `refactor: extract method`)
+
+## Testing
 
 We follow specific RSpec conventions across the project. Please follow these when writing tests.
 
@@ -43,7 +58,7 @@ end
 
 ### Wrap Tests in `context` Blocks
 
-All tests must be inside `context` blocks, no file-level `it` blocks. Context descriptions should start with "when":
+All tests must be inside `context` blocks, no file-level `it` blocks:
 
 ```ruby
 context "when executing a single command" do
@@ -54,28 +69,6 @@ context "when executing a single command" do
   it "returns the command output" do
     expect(subject_call).to eq("hello")
   end
-end
-```
-
-### Single Expectation per `it`
-
-Each `it` block should contain only one `expect`:
-
-```ruby
-# Good
-it "returns the command output" do
-  expect(subject_call).to eq("hello")
-end
-
-it "logs the command executed" do
-  subject_method
-  expect(log_output.join).to include("Executed: echo hello")
-end
-
-# Bad
-it "returns output and logs" do
-  expect(subject_call).to eq("hello")
-  expect(log_output.join).to include("Executed: echo hello")
 end
 ```
 
@@ -94,17 +87,6 @@ end
 it "returns the command output" do
   expect(subject_call).to eq("hello")
 end
-```
-
-### Prefer `let` Over Instance Variables
-
-```ruby
-# Good
-let(:ssh_host) { "testuser@localhost" }
-let(:ssh_key) { ssh_test_key_path }
-
-# Bad
-before { @ssh_host = "testuser@localhost" }
 ```
 
 ### Clean Up Global State with `after`
@@ -156,10 +138,3 @@ RSpec.describe RubyShell::Parsers::Json do
   end
 end
 ```
-
-## Code Style
-
-- Ruby 2.6+ target
-- Follow RuboCop defaults, run `rubocop -a` to auto-fix
-- 2-space indentation, double-quoted strings, 120 char line length
-- (Optional) Commit messages use `type: summary` format (e.g., `fix: update version`, `refactor: extract method`)

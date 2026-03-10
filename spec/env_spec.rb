@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe RubyShell do
-  around(:example) do |example|
+  around do |example|
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) { example.run }
     end
@@ -42,8 +42,11 @@ RSpec.describe RubyShell do
         RubyShell.env["VAR_B"] = "b"
       end
 
-      it "makes all variables available" do
+      it "makes the first variable available" do
         expect(sh.printenv("VAR_A")).to eq("a")
+      end
+
+      it "makes the second variable available" do
         expect(sh.printenv("VAR_B")).to eq("b")
       end
     end
