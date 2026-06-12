@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "debug"
 module RubyShell
   class Chainer
     attr_reader :parts, :options

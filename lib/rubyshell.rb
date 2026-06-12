@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "logger"
-
 require_relative "rubyshell/version"
 require_relative "rubyshell/command"
 require_relative "rubyshell/chainer"
@@ -43,6 +41,8 @@ module RubyShell
     attr_writer :logger
 
     def logger
+      require "logger"
+
       @logger ||= Logger.new($stdout)
     end
 

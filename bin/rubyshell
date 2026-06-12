@@ -1,5 +1,7 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env -S ruby --disable-gems
 # frozen_string_literal: true
+
+$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 
 require "rubyshell"
 
