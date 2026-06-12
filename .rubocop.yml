@@ -5,6 +5,8 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 2.6
   SuggestExtensions: false
+  Exclude:
+    - "sshd-config/**/*"
 
 Style/StringLiterals:
   Enabled: true
