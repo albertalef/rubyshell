@@ -4,8 +4,6 @@ require "open3"
 
 module RubyShell
   module TerminalExecutor
-    SELECT_TIMEOUT = Rational(1, 20).freeze
-
     def self.capture(command, options) # rubocop:disable Metris/MethodLength,Metrics/CyclomaticComplexity,Metrix/AbcSize,Metrics/PerceivedComplexity
       stdin_value = if options[:_stdin].is_a?(RubyShell::Command) || options[:_stdin].is_a?(RubyShell::Chainer)
                       options[:_stdin].exec
@@ -27,17 +25,11 @@ module RubyShell
         error = +""
         ios = { stdout => output, stderr => error }
 
-        status = nil
-
-        # What was my idea here:
-        # If has not any io readable and the program exited in the previous loop, stop
+        # Block until a pipe has data (or hits EOF) instead of polling, so we
+        # dont burn a CPU core spinning while the command runs.
+        # EOF on both pipes empties ios and ends the loop, then we reap the exit status
         until ios.empty?
-          status ||= w_thread.join(0)
-
-          readable, = IO.select(ios.keys, nil, nil, 0)
-
-          break if !readable && status
-          next unless readable
+          readable, = IO.select(ios.keys)
 
           readable.each do |io|
             loop do
