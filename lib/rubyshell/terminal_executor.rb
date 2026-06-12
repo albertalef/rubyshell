@@ -34,7 +34,7 @@ module RubyShell
         until ios.empty?
           status ||= w_thread.join(0)
 
-          readable, = IO.select(ios.keys, nil, nil, 0)
+          readable, = IO.select(ios.keys, nil, nil, SELECT_TIMEOUT)
 
           break if !readable && status
           next unless readable
