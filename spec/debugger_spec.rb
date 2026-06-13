@@ -41,6 +41,12 @@ RSpec.describe RubyShell::Debugger do
 
       expect(log_output.join).to include("Stdout: \"#{expected_output}\"")
     end
+
+    it "logs the stderr" do
+      subject_method
+
+      expect(log_output.join).to include("Stderr: \"\"")
+    end
   end
 
   RSpec.shared_examples "a silent command" do
@@ -84,6 +90,16 @@ RSpec.describe RubyShell::Debugger do
         sh.echo("hello", _debug: true)
       end
       it_behaves_like "a logged command", "hello"
+
+      it "logs failed commands before reraising" do
+        expect do
+          sh.ruby("-e", "\"STDERR.write(%q{bad}); exit 1\"", _debug: true)
+        end.to raise_error(RubyShell::CommandError)
+
+        expect(log_output.join).to include("Exit code: 1")
+        expect(log_output.join).to include("Stdout: \"\"")
+        expect(log_output.join).to include("Stderr: \"bad\"")
+      end
     end
 
     context "when debug mode is enabled globally" do
