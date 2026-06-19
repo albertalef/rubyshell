@@ -100,6 +100,23 @@ RSpec.describe RubyShell::Debugger do
         expect(log_output.join).to include("Stdout: \"\"")
         expect(log_output.join).to include("Stderr: \"bad\"")
       end
+
+      it "keeps error attributes available when rescued outside the wrapper" do
+        error = nil
+
+        begin
+          sh.ruby("-e", "\"STDOUT.write(%q{out}); STDERR.write(%q{bad}); exit 1\"", _debug: true)
+        rescue RubyShell::CommandError => e
+          error = e
+        end
+
+        expect(error).to be_a(RubyShell::CommandError)
+        expect(error.command.to_shell.chomp).to include("ruby")
+        expect(error.command.to_shell.chomp).to include("STDOUT.write")
+        expect(error.stdout).to eq("out")
+        expect(error.stderr).to eq("bad")
+        expect(error.status.exitstatus).to eq(1)
+      end
     end
 
     context "when debug mode is enabled globally" do
