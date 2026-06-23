@@ -111,8 +111,8 @@ RSpec.describe RubyShell::Debugger do
         end
 
         expect(error).to be_a(RubyShell::CommandError)
-        expect(error.command.to_shell.chomp).to include("ruby")
-        expect(error.command.to_shell.chomp).to include("STDOUT.write")
+        expect(error.command.to_s).to include("ruby")
+        expect(error.command.to_s).to include("STDOUT.write")
         expect(error.stdout).to eq("out")
         expect(error.stderr).to eq("bad")
         expect(error.status.exitstatus).to eq(1)
