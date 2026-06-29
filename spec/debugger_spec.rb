@@ -89,33 +89,61 @@ RSpec.describe RubyShell::Debugger do
       def subject_method
         sh.echo("hello", _debug: true)
       end
+
+      def run_failed_debug_command
+        sh.ruby("-e", "\"STDERR.write(%q{bad}); exit 1\"", _debug: true)
+      rescue RubyShell::CommandError
+        nil
+      end
+
+      def rescued_failed_debug_command
+        sh.ruby("-e", "\"STDOUT.write(%q{out}); STDERR.write(%q{bad}); exit 1\"", _debug: true)
+        nil
+      rescue RubyShell::CommandError => e
+        e
+      end
+
       it_behaves_like "a logged command", "hello"
 
-      it "logs failed commands before reraising" do
+      it "reraises failed commands" do
         expect do
           sh.ruby("-e", "\"STDERR.write(%q{bad}); exit 1\"", _debug: true)
         end.to raise_error(RubyShell::CommandError)
+      end
 
+      it "logs failed command exit code before reraising" do
+        run_failed_debug_command
         expect(log_output.join).to include("Exit code: 1")
+      end
+
+      it "logs failed command stdout before reraising" do
+        run_failed_debug_command
         expect(log_output.join).to include("Stdout: \"\"")
+      end
+
+      it "logs failed command stderr before reraising" do
+        run_failed_debug_command
         expect(log_output.join).to include("Stderr: \"bad\"")
       end
 
-      it "keeps error attributes available when rescued outside the wrapper" do
-        error = nil
+      it "keeps the rescued error type available" do
+        expect(rescued_failed_debug_command).to be_a(RubyShell::CommandError)
+      end
 
-        begin
-          sh.ruby("-e", "\"STDOUT.write(%q{out}); STDERR.write(%q{bad}); exit 1\"", _debug: true)
-        rescue RubyShell::CommandError => e
-          error = e
-        end
+      it "keeps the rescued error command available" do
+        expect(rescued_failed_debug_command.command.to_s).to include("STDOUT.write")
+      end
 
-        expect(error).to be_a(RubyShell::CommandError)
-        expect(error.command.to_s).to include("ruby")
-        expect(error.command.to_s).to include("STDOUT.write")
-        expect(error.stdout).to eq("out")
-        expect(error.stderr).to eq("bad")
-        expect(error.status.exitstatus).to eq(1)
+      it "keeps the rescued error stdout available" do
+        expect(rescued_failed_debug_command.stdout).to eq("out")
+      end
+
+      it "keeps the rescued error stderr available" do
+        expect(rescued_failed_debug_command.stderr).to eq("bad")
+      end
+
+      it "keeps the rescued error status available" do
+        expect(rescued_failed_debug_command.status.exitstatus).to eq(1)
       end
     end
 
