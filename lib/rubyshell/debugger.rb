@@ -28,10 +28,12 @@ module RubyShell
       private
 
       def log_command(command, duration, status, stdout, stderr)
+        pid = status.pid if status.respond_to?(:pid)
+
         RubyShell.log(<<~TEXT
           \nExecuted: #{command.to_shell.chomp}
             Duration: #{format("%.6f", duration)}s
-            Pid: #{status.respond_to?(:pid) ? status.pid : ""}
+            Pid: #{pid}
             Exit code: #{status.respond_to?(:exitstatus) ? status.exitstatus : status.to_i}
             Stdout: #{stdout.inspect}
             Stderr: #{stderr.inspect}
