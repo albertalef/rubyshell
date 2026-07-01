@@ -90,60 +90,71 @@ RSpec.describe RubyShell::Debugger do
         sh.echo("hello", _debug: true)
       end
 
-      def run_failed_debug_command
-        sh.ruby("-e", "\"STDERR.write(%q{bad}); exit 1\"", _debug: true)
-      rescue RubyShell::CommandError
-        nil
-      end
+      def execute_failed_debug_command(stdout: nil, stderr: "bad")
+        script_parts = []
+        script_parts << "STDOUT.write(%q{#{stdout}})" if stdout
+        script_parts << "STDERR.write(%q{#{stderr}})" if stderr
+        script_parts << "exit 1"
 
-      def rescued_failed_debug_command
-        sh.ruby("-e", "\"STDOUT.write(%q{out}); STDERR.write(%q{bad}); exit 1\"", _debug: true)
-        nil
-      rescue RubyShell::CommandError => e
-        e
+        sh.ruby("-e", "\"#{script_parts.join("; ")}\"", _debug: true)
       end
 
       it_behaves_like "a logged command", "hello"
 
       it "reraises failed commands" do
         expect do
-          sh.ruby("-e", "\"STDERR.write(%q{bad}); exit 1\"", _debug: true)
+          execute_failed_debug_command
         end.to raise_error(RubyShell::CommandError)
       end
 
-      it "logs failed command exit code before reraising" do
-        run_failed_debug_command
-        expect(log_output.join).to include("Exit code: 1")
+      context "when a failed debug command is rescued" do
+        before do
+          begin
+            execute_failed_debug_command
+          rescue RubyShell::CommandError
+            nil
+          end
+        end
+
+        it "logs failed command exit code before reraising" do
+          expect(log_output.join).to include("Exit code: 1")
+        end
+
+        it "logs failed command stdout before reraising" do
+          expect(log_output.join).to include("Stdout: \"\"")
+        end
+
+        it "logs failed command stderr before reraising" do
+          expect(log_output.join).to include("Stderr: \"bad\"")
+        end
       end
 
-      it "logs failed command stdout before reraising" do
-        run_failed_debug_command
-        expect(log_output.join).to include("Stdout: \"\"")
-      end
+      context "when the caller rescues the command error" do
+        subject(:rescued_error) do
+          execute_failed_debug_command(stdout: "out", stderr: "bad")
+        rescue RubyShell::CommandError => e
+          e
+        end
 
-      it "logs failed command stderr before reraising" do
-        run_failed_debug_command
-        expect(log_output.join).to include("Stderr: \"bad\"")
-      end
+        it "keeps the rescued error type available" do
+          expect(rescued_error).to be_a(RubyShell::CommandError)
+        end
 
-      it "keeps the rescued error type available" do
-        expect(rescued_failed_debug_command).to be_a(RubyShell::CommandError)
-      end
+        it "keeps the rescued error command available" do
+          expect(rescued_error.command.to_s).to include("STDOUT.write")
+        end
 
-      it "keeps the rescued error command available" do
-        expect(rescued_failed_debug_command.command.to_s).to include("STDOUT.write")
-      end
+        it "keeps the rescued error stdout available" do
+          expect(rescued_error.stdout).to eq("out")
+        end
 
-      it "keeps the rescued error stdout available" do
-        expect(rescued_failed_debug_command.stdout).to eq("out")
-      end
+        it "keeps the rescued error stderr available" do
+          expect(rescued_error.stderr).to eq("bad")
+        end
 
-      it "keeps the rescued error stderr available" do
-        expect(rescued_failed_debug_command.stderr).to eq("bad")
-      end
-
-      it "keeps the rescued error status available" do
-        expect(rescued_failed_debug_command.status.exitstatus).to eq(1)
+        it "keeps the rescued error status available" do
+          expect(rescued_error.status.exitstatus).to eq(1)
+        end
       end
     end
 
