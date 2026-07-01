@@ -41,6 +41,12 @@ RSpec.describe RubyShell::Debugger do
 
       expect(log_output.join).to include("Stdout: \"#{expected_output}\"")
     end
+
+    it "logs the stderr" do
+      subject_method
+
+      expect(log_output.join).to include("Stderr: \"\"")
+    end
   end
 
   RSpec.shared_examples "a silent command" do
@@ -83,7 +89,73 @@ RSpec.describe RubyShell::Debugger do
       def subject_method
         sh.echo("hello", _debug: true)
       end
+
+      def execute_failed_debug_command(stdout: nil, stderr: "bad")
+        script_parts = []
+        script_parts << "STDOUT.write(%q{#{stdout}})" if stdout
+        script_parts << "STDERR.write(%q{#{stderr}})" if stderr
+        script_parts << "exit 1"
+
+        sh.ruby("-e", "\"#{script_parts.join("; ")}\"", _debug: true)
+      end
+
       it_behaves_like "a logged command", "hello"
+
+      it "reraises failed commands" do
+        expect do
+          execute_failed_debug_command
+        end.to raise_error(RubyShell::CommandError)
+      end
+
+      context "when a failed debug command is rescued" do
+        before do
+          begin
+            execute_failed_debug_command
+          rescue RubyShell::CommandError
+            nil
+          end
+        end
+
+        it "logs failed command exit code before reraising" do
+          expect(log_output.join).to include("Exit code: 1")
+        end
+
+        it "logs failed command stdout before reraising" do
+          expect(log_output.join).to include("Stdout: \"\"")
+        end
+
+        it "logs failed command stderr before reraising" do
+          expect(log_output.join).to include("Stderr: \"bad\"")
+        end
+      end
+
+      context "when the caller rescues the command error" do
+        subject(:rescued_error) do
+          execute_failed_debug_command(stdout: "out", stderr: "bad")
+        rescue RubyShell::CommandError => e
+          e
+        end
+
+        it "keeps the rescued error type available" do
+          expect(rescued_error).to be_a(RubyShell::CommandError)
+        end
+
+        it "keeps the rescued error command available" do
+          expect(rescued_error.command.to_s).to include("STDOUT.write")
+        end
+
+        it "keeps the rescued error stdout available" do
+          expect(rescued_error.stdout).to eq("out")
+        end
+
+        it "keeps the rescued error stderr available" do
+          expect(rescued_error.stderr).to eq("bad")
+        end
+
+        it "keeps the rescued error status available" do
+          expect(rescued_error.status.exitstatus).to eq(1)
+        end
+      end
     end
 
     context "when debug mode is enabled globally" do
