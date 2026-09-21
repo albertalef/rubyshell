@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/tamatebako/tebako-ubuntu-20.04:latest
+      image: ghcr.io/tamatebako/tebako-ubuntu-20.04:0.12.6
 
     steps:
       - name: Checkout
