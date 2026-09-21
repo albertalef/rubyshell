@@ -73,5 +73,15 @@ RSpec.describe RubyShell do
         )
       end
     end
+
+    context "when hash args use symbol keys" do
+      let(:subject_instance) do
+        RubyShell::Command.new("example", verbose: true, _debug: true)
+      end
+
+      it "renders public options and skips internal options" do
+        expect(subject_instance.to_shell).to eq("example --verbose")
+      end
+    end
   end
 end

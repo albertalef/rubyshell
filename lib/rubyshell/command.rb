@@ -62,14 +62,15 @@ module RubyShell
 
     def map_hash_arg(arg)
       arg.map do |k, v|
-        next if k.start_with?("_")
+        key = k.to_s
+        next if key.start_with?("_")
 
         if v.is_a?(Array)
           v.map do |e|
-            map_hash_entry_to_string(k, e)
+            map_hash_entry_to_string(key, e)
           end.join(" ")
         else
-          map_hash_entry_to_string(k, v)
+          map_hash_entry_to_string(key, v)
         end
       end.compact
     end
