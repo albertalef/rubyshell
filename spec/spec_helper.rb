@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 require "tmpdir"
-require "debug"
+begin
+  # The debug gem requires Ruby >= 2.7; the 2.6 job runs without it.
+  require "debug"
+rescue LoadError
+  nil
+end
 require_relative "../lib/rubyshell"
 
 RSpec.configure do |config|
