@@ -67,6 +67,10 @@ end
 module Kernel
   def sh(command = nil, *args, **kwargs, &block)
     if command
+      # On Ruby 2.6 an empty **kwargs is still passed along as a positional
+      # empty hash, which breaks arity for methods like OverwritedCommands#cd.
+      return RubyShell::Executor.send(command, *args) if kwargs.empty?
+
       RubyShell::Executor.send(command, *args, **kwargs)
     elsif block.nil?
       RubyShell::Executor

@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require "tmpdir"
-require "debug"
+# The debug gem requires Ruby >= 2.7. On 2.6 `require "debug"` would load the
+# stdlib debugger (rdb) instead, which takes over the run on the first raise.
+require "debug" if RUBY_VERSION >= "2.7"
 require_relative "../lib/rubyshell"
 
 RSpec.configure do |config|

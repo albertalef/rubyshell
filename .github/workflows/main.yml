@@ -9,12 +9,22 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     name: Ruby ${{ matrix.ruby }}
     strategy:
+      fail-fast: false
       matrix:
-        ruby:
-          - '3.2.2'
+        include:
+          - ruby: '3.2.2'
+            os: ubuntu-latest
+            task: 'bundle exec rake'
+          - ruby: '2.6'
+            os: ubuntu-22.04
+            task: 'bundle exec rspec'
+            gemfile: 'gemfiles/ruby26.gemfile'
+
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile || 'Gemfile' }}
 
     steps:
     - uses: actions/checkout@v4
@@ -24,4 +34,4 @@ jobs:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
     - name: Run the default task
-      run: bundle exec rake
+      run: ${{ matrix.task }}

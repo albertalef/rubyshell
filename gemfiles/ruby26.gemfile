@@ -1,0 +1,11 @@
+# frozen_string_literal: true
+
+# Minimal dependency set for the Ruby 2.6 compatibility job.
+# The main Gemfile pulls in debug (needs >= 2.7) and rubocop, which do not
+# install on 2.6; this one only carries what the specs need.
+source "https://rubygems.org"
+
+gemspec path: ".."
+
+gem "rake", "~> 13.0"
+gem "rspec", "~> 3.0"
