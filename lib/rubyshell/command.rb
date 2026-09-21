@@ -41,7 +41,7 @@ module RubyShell
     private
 
     def method_missing(method_name, *args, &block)
-      if method_name.start_with?(/[^A-Za-z0-9]/)
+      if method_name.to_s.match?(/\A[^A-Za-z0-9]/)
         RubyShell::Chainer.new(self).send(method_name, *args, block)
       else
         super
