@@ -24,7 +24,7 @@ module RubyShell
     end
 
     def settings
-      @options.select { shared_settings.include?(_1.to_sym) }.transform_keys { :"_#{_1}" }
+      @options.select { |k, _v| shared_settings.include?(k.to_sym) }.transform_keys { |k| :"_#{k}" }
     end
 
     def method_missing(method_name, *args, &block)

@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
 require "tmpdir"
-begin
-  # The debug gem requires Ruby >= 2.7; the 2.6 job runs without it.
-  require "debug"
-rescue LoadError
-  nil
-end
+# The debug gem requires Ruby >= 2.7. On 2.6 `require "debug"` would load the
+# stdlib debugger (rdb) instead, which takes over the run on the first raise.
+require "debug" if RUBY_VERSION >= "2.7"
 require_relative "../lib/rubyshell"
 
 RSpec.configure do |config|
