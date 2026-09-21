@@ -2,7 +2,7 @@
 
 module RubyShell
   class CommandError < StandardError
-    attr_reader :command, :status
+    attr_reader :command, :stdout, :stderr, :status
 
     def initialize(command:, stdout: "", stderr: "", status: "", message: nil)
       @command = command

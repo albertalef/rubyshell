@@ -10,6 +10,28 @@ RSpec.describe RubyShell do
   end
 
   describe "Validating Chains" do
+    context "when chaining several commands with symbolic pipe operators" do
+      def subject_call
+        sh do
+          (printf!("hello") | cat! | cat!).exec
+        end
+      end
+
+      it "executes every command in the pipeline" do
+        expect(subject_call).to eq("hello")
+      end
+    end
+
+    context "when an unknown ordinary method is called on a command" do
+      def subject_call
+        RubyShell::Command.new("printf", "hello").unknown_chain_method
+      end
+
+      it "raises for the requested method instead of operator detection" do
+        expect { subject_call }.to raise_error(NoMethodError, /unknown_chain_method/)
+      end
+    end
+
     context "when counting files in current folder" do
       def subject_call
         sh do
